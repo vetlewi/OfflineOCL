@@ -1,0 +1,12 @@
+
+
+# Importing the gain shit information.
+Gain file /Users/vetlewi/Desktop/beam_test_march/input_files/gain_shift.dat
+
+range /Users/vetlewi/Desktop/beam_test_march/input_files/zrange_p.dat
+
+# Now we will need to read files... There is a lot of the :O
+data directory /Users/vetlewi/Desktop/beam_test_march
+data file merged.bin
+
+export root  /Users/vetlewi/Desktop/beam_test_march/output_files/beam_test.root
