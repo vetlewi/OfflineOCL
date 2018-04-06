@@ -131,7 +131,7 @@ void UserSort::CreateSpectra()
         energy_labr_cal[i] = Spec(tmp, tmp, 10000, 0, 10000, "Energy [keV]");
 
         sprintf(tmp, "time_labr_%02d", i+1);
-        time_labr[i] = Spec(tmp, tmp, 10000, -500, 500, "Time t_{LaBr} - t_{#Delta E} [ns]");
+        time_labr[i] = Spec(tmp, tmp, 5000, -2500, 2500, "Time t_{LaBr} - t_{#Delta E} [ns]");
 
     }
 
@@ -249,6 +249,14 @@ bool UserSort::Sort(const Event &event)
         ede[e_seg][de_seg-8*e_seg]->Fill(e_energy, de_energy);
         // Time diff.
 
+        for (i = 0 ; i < NUM_LABR_DETECTORS ; ++i){
+            for (j = 0 ; j < event.n_labr[i] ; ++j){
+                int64_t tdiff_c = event.w_labr[i][j].timestamp - de_word.timestamp;
+                double tdiff_f = event.w_labr[i][j].cfdcorr - de_word.cfdcorr;
+                time_labr[i]->Fill(tdiff_c+tdiff_f);
+            }
+        }
+
         if (gain_E[e_seg] != 1 && gain_dE[de_seg] != 1){
             double thick = range.GetRange(e_energy+de_energy) - range.GetRange(e_energy);
             h_particle->Fill(thick);
@@ -258,15 +266,7 @@ bool UserSort::Sort(const Event &event)
 
                 // If we have arrived at this point we might as well do timing between
                 // labr and dE.
-                for (i = 0 ; i < NUM_LABR_DETECTORS ; ++i){
-                    for (j = 0 ; j < event.n_labr[i] ; ++j){
-                        int64_t tdiff_c = event.w_labr[i][j].timestamp - de_word.timestamp;
-                        double tdiff_f = event.w_labr[i][j].cfdcorr - de_word.cfdcorr;
-                        time_labr[i]->Fill(tdiff_c+tdiff_f);
-                        if (i == 0)
-                            alfna_labr_1->Fill(event.w_labr[i][j].adcdata, ex*1000);
-                    }
-                }
+
 
             }
         }
