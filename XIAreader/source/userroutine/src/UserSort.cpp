@@ -38,8 +38,9 @@
 #include <vector>
 #include <fstream>
 
-#include <printf.h>
+//#include <printf.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 static bool set_par(Parameters& parameters, std::istream& ipar,
                     const std::string& name, int size)
