@@ -138,3 +138,6 @@ CMakeLists.txt.user*
 
 # We don't want to copy .root files.
 *.root
+
+.DS_Store
+.DS_Store?
