@@ -44,16 +44,24 @@ protected:
 
 private:
 
+    // Method for calibrating energy of a detector.
+    double CalibrateE(const word_t &w) const;
+
+    // Method for getting time difference between two words.
+    double CalcTimediff(const word_t &start, const word_t &stop) const;
+
     Histogram1Dp energy_labr[NUM_LABR_DETECTORS], energy_labr_cal[NUM_LABR_DETECTORS];
     Histogram1Dp energy_dE[NUM_SI_DE_DET], energy_dE_cal[NUM_SI_DE_DET];
     Histogram1Dp energy_E[NUM_SI_E_DET], energy_E_cal[NUM_SI_E_DET];
     Histogram2Dp time_e_de[NUM_SI_E_DET];
 
     Histogram1Dp time_labr[NUM_LABR_DETECTORS];
-    Histogram2Dp time_ppac_labr[NUM_PPAC];
+    Histogram2Dp time_ppac_labr[NUM_PPAC], time_de_labr[NUM_SI_DE_DET];
+
+    Histogram2Dp time_energy_labr1;
 
     // DE - E spectra (everything in same...)
-    Histogram2Dp ede_all, ede[NUM_SI_RINGS][NUM_SI_E_DET];
+    Histogram2Dp ede_all, ede[NUM_SI_RINGS][NUM_SI_E_DET], ede_cal[NUM_SI_RINGS][NUM_SI_E_DET];
 
     // Particle gated E-DE
     Histogram2Dp ede_gate, alfna_labr_1;
@@ -79,9 +87,19 @@ private:
     // Shift E
     Parameter shift_E;
 
-    // Time alignment
-    Parameter time_align;
+    // Time alignment LaBr
+    Parameter shift_time_labr;
 
+    // Time alignment dE
+    Parameter shift_time_de;
+
+    // Time alignment E
+    Parameter shift_time_e;
+
+    // Time alignment PPACs
+    Parameter shift_time_ppac;
+
+    int n_fail_de, n_fail_e;
 
 
 };

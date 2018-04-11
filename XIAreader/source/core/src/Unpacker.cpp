@@ -124,7 +124,7 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
             // We will move back a given number of words and check timestamps
             for (int j = i ; j > 0 ; --j){
                 timediff = (*buffer)[j-1].timestamp - cWord.timestamp;
-                if (abs(timediff) > 2500){
+                if (abs(timediff) > 500){
                     start = j;
                     break;
                 }
@@ -132,7 +132,7 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
 
             for (int j = i ; j < buffer->GetSize() - 1 ; ++j){
                 timediff = (*buffer)[j+1].timestamp - cWord.timestamp;
-                if (abs(timediff) > 2500){
+                if (abs(timediff) > 1500){
                     stop = j+1;
                     break;
                 }

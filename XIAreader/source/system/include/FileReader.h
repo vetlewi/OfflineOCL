@@ -84,7 +84,8 @@ private:
     bool ReadEvent(word_t &hit);
 
     // Static array used as a buffer.
-    uint32_t tmp[16384];
+    uint32_t eventdata[4];
+    int event_length;
 };
 
 #endif // FILEREADER_H
