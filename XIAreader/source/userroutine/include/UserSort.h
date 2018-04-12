@@ -43,6 +43,8 @@ protected:
     void CreateSpectra();
 
 private:
+    // Method to give names to some paramters
+    void NameTimeParameters();
 
     // Method for calibrating energy of a detector.
     double CalibrateE(const word_t &w) const;
@@ -50,24 +52,32 @@ private:
     // Method for getting time difference between two words.
     double CalcTimediff(const word_t &start, const word_t &stop) const;
 
-    Histogram1Dp energy_labr[NUM_LABR_DETECTORS], energy_labr_cal[NUM_LABR_DETECTORS];
-    Histogram1Dp energy_dE[NUM_SI_DE_DET], energy_dE_cal[NUM_SI_DE_DET];
-    Histogram1Dp energy_E[NUM_SI_E_DET], energy_E_cal[NUM_SI_E_DET];
+    Histogram1Dp energy_labr_raw[NUM_LABR_DETECTORS], energy_labr[NUM_LABR_DETECTORS];
+    Histogram1Dp energy_dE_raw[NUM_SI_DE_DET], energy_dE[NUM_SI_DE_DET];
+    Histogram1Dp energy_E_raw[NUM_SI_E_DET], energy_E[NUM_SI_E_DET];
     Histogram2Dp time_e_de[NUM_SI_E_DET];
 
     Histogram1Dp time_labr[NUM_LABR_DETECTORS];
-    Histogram2Dp time_ppac_labr[NUM_PPAC], time_de_labr[NUM_SI_DE_DET];
+    Histogram2Dp time_labr_all;
+    // Histogram2Dp time_ppac_labr[NUM_PPAC], time_de_labr[NUM_SI_DE_DET];
+    Histogram2Dp time_ppac_labr[NUM_PPAC];
 
-    Histogram2Dp time_energy_labr1;
+    Histogram2Dp time_energy_labr;
 
     // DE - E spectra (everything in same...)
-    Histogram2Dp ede_all, ede[NUM_SI_RINGS][NUM_SI_E_DET], ede_cal[NUM_SI_RINGS][NUM_SI_E_DET];
+    Histogram2Dp ede_all, ede_raw[NUM_SI_E_DET][NUM_SI_RINGS], ede[NUM_SI_E_DET][NUM_SI_RINGS];
+    Histogram2Dp ede_thick; // gated on the apparent thickness
+    Histogram1Dp h_ede[NUM_SI_E_DET][NUM_SI_RINGS], h_ede_r[NUM_SI_RINGS], h_ex_r[NUM_SI_RINGS];
+    Histogram1Dp h_ede_all, h_thick;
 
     // Particle gated E-DE
-    Histogram2Dp ede_gate, alfna_labr_1;
+    Histogram2Dp ede_gate;
 
     // Excitation energy figure
-    Histogram1Dp h_ex, h_particle;
+    Histogram1Dp h_ex;
+
+    // Particle - gamma-ray coincidence matrix
+    Histogram2Dp alfna, alfna_bg;
 
     // Gain labr
     Parameter gain_labr;
@@ -98,6 +108,33 @@ private:
 
     // Time alignment PPACs
     Parameter shift_time_ppac;
+
+    // Coefficients of 2nd order Polynomial to calculate excitation energy from SiRi energy (E+dE).
+    Parameter ex_from_ede;
+
+    //   // Two rectangles to cut away SiRi noise/electrons
+    //     Parameter ede_rect;
+
+    // Apparent thickness gate SiRi
+    Parameter thick_range;
+
+    // Struct to hold the time gates
+    struct TimeGate
+    {
+    double lower_prompt;
+    double higher_prompt;
+    double lower_bg;
+    double higher_bg;
+    };
+
+    // Time gates for the NaI detectors, e.g. for making the ALFNA matrices
+    Parameter labr_time_cuts;
+    TimeGate labr_time_cut;
+
+    // Time gates for the ppacs.
+    Parameter ppac_time_cuts;
+    TimeGate ppac_time_cut;
+
 
     int n_fail_de, n_fail_e;
 
