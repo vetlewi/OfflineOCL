@@ -58,11 +58,16 @@ private:
     Histogram2Dp time_e_de[NUM_SI_E_DET];
 
     Histogram1Dp time_labr[NUM_LABR_DETECTORS];
-    Histogram2Dp time_labr_all;
+    Histogram2Dp energy_labr_all, time_labr_all;
     // Histogram2Dp time_ppac_labr[NUM_PPAC], time_de_labr[NUM_SI_DE_DET];
     Histogram2Dp time_ppac_labr[NUM_PPAC];
 
     Histogram2Dp time_energy_labr;
+    Histogram2Dp time_energy_ppac_labr[NUM_PPAC]; // ppac_gated
+
+    Histogram2Dp time_ppac_de[NUM_PPAC];
+    Histogram2Dp time_energy_ppac_de[NUM_PPAC];
+
 
     // DE - E spectra (everything in same...)
     Histogram2Dp ede_all, ede_raw[NUM_SI_E_DET][NUM_SI_RINGS], ede[NUM_SI_E_DET][NUM_SI_RINGS];
@@ -78,6 +83,7 @@ private:
 
     // Particle - gamma-ray coincidence matrix
     Histogram2Dp alfna, alfna_bg;
+    Histogram2Dp alfna_ppac, alfna_bg_ppac; // gated on ppacs
 
     // Gain labr
     Parameter gain_labr;

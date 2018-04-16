@@ -256,6 +256,9 @@ void UserSort::CreateSpectra()
 
     }
 
+    sprintf(tmp, "energy_labr");
+    energy_labr_all = Mat(tmp, tmp, 10000, 0, 10000, "Energy [keV]", NUM_LABR_DETECTORS, 0, NUM_LABR_DETECTORS, "LaBr_{3}(Ce) nr.");
+
     sprintf(tmp, "time_labr");
     time_labr_all = Mat(tmp, tmp, 5000, -2500, 2500, "Time t_{LaBr} - t_{#Delta E} [ns]", NUM_LABR_DETECTORS, 0, NUM_LABR_DETECTORS, "LaBr_{3}(Ce) nr.");
 
@@ -324,16 +327,32 @@ void UserSort::CreateSpectra()
     h_ex = Spec(tmp, tmp, 15000, 0, 30000, "Excitation energy [keV]");
 
     for (int i = 0 ; i < NUM_PPAC ; ++i){
-        sprintf(tmp, "time_ppac_labr_%02d", i);
+        sprintf(tmp, "time_ppac%d_labr", i);
         time_ppac_labr[i] = Mat(tmp, tmp, 10000, -2500, 2500, "Time [ns]", NUM_LABR_DETECTORS, 0, NUM_LABR_DETECTORS, "LaBr nr.");
+
+        sprintf(tmp, "time_energy_ppac%d_labr", i);
+        time_energy_ppac_labr[i] = Mat(tmp, tmp, 400, -100, 100, "Time [ns]", 300, 0, 10000, "LaBr Energy [keV]");
+
+        sprintf(tmp, "time_ppac%d_de", i);
+        time_ppac_de[i] = Mat(tmp, tmp, 2500, -500, 500, "Time [ns]", NUM_SI_DE_DET, 0, NUM_SI_DE_DET, "dE nr.");
+
+        sprintf(tmp, "time_energy_ppac%d_de", i);
+        time_energy_ppac_de[i] = Mat(tmp, tmp, 400, -100, 100, "Time [ns]", 300, 0, 10000, "dE Energy [keV]");
     }
 
     time_energy_labr = Mat("time_energy_labr", "", 1024, 0, 32768, "Energy [ch]", 1000, -500, 500, "Time [ns]");
 
     sprintf(tmp, "alfna");
     alfna = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1100, -1000, 15000, "Ex [keV]");
+
     sprintf(tmp, "alfna_bg");
     alfna_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1100, -1000, 15000, "Ex [keV]");
+
+    sprintf(tmp, "alfna_ppac");
+    alfna_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1100, -1000, 15000, "Ex [keV]");
+
+    sprintf(tmp, "alfna_bg_ppac");
+    alfna_bg_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1100, -1000, 15000, "Ex [keV]");
 
     n_fail_e = 0;
     n_fail_de = 0;
@@ -344,10 +363,10 @@ bool UserSort::Sort(const Event &event)
 {
     int i, j;
     double energy;
-    double tdiff;
+    double tdiff, tdiff_ppac_labr, tdiff_ppac_de;
     unsigned int e_seg=0;
     unsigned int de_seg=0;
-    word_t e_word, de_word;
+    word_t e_word, de_word, ppac_word;
 
     NameTimeParameters();
 
@@ -356,6 +375,7 @@ bool UserSort::Sort(const Event &event)
             energy_labr_raw[i]->Fill(event.w_labr[i][j].adcdata);
             energy = CalibrateE(event.w_labr[i][j]);
             energy_labr[i]->Fill(energy);
+            energy_labr_all->Fill(energy, i);
         }
     }
 
@@ -383,16 +403,16 @@ bool UserSort::Sort(const Event &event)
         }
     }
 
-    for (i = 0 ; i < NUM_PPAC ; ++i){
-        for (int j = 0 ; j < event.n_ppac[i] ; ++j){
-            for (int n = 0 ; n < NUM_LABR_DETECTORS ; ++n){
-                for ( int m = 0 ; m < event.n_labr[n] ; ++m){
-                    tdiff = CalcTimediff(event.w_ppac[i][j], event.w_labr[n][m]);
-                    time_ppac_labr[i]->Fill(tdiff, n);
-                }
-            }
-        }
-    }
+//    for (i = 0 ; i < NUM_PPAC ; ++i){
+//        for (int j = 0 ; j < event.n_ppac[i] ; ++j){
+//            for (int n = 0 ; n < NUM_LABR_DETECTORS ; ++n){
+//                for ( int m = 0 ; m < event.n_labr[n] ; ++m){
+//                    tdiff = CalcTimediff(event.w_ppac[i][j], event.w_labr[n][m]);
+//                    time_ppac_labr[i]->Fill(tdiff, n);
+//                }
+//            }
+//        }
+//    }
 
 
     // Check if only one SiRi combination fired
@@ -454,6 +474,41 @@ bool UserSort::Sort(const Event &event)
                     else if (tdiff > labr_time_cut.lower_bg && tdiff < labr_time_cut.higher_bg){
                         alfna->Fill(labr_energy, ex, -1);
                         alfna_bg->Fill(labr_energy, ex, 1);
+                    }
+
+                    // Fission related sorting
+
+                    // TODO(!!):
+                    // Copy from old sorting code:
+                    //// keep this outside the if defined statement, such that if no PPACs are used, all events are considered
+                    //// fiss = 0 -> by default, an event is not considered as a fission event; changed only if recognized in the for loop below
+                    // int fiss = 0;
+                    ////        if ( na_t_f>190 && na_t_f<220 && na_e_f>1195 && na_e_f<1225 ) fiss = 1;
+                    // // Fabio: don't want energy requirement at the moment
+                    ////        if ( CheckPPACpromptGate(ppac_t_c) &&  fission_excitation_energy_min[0] < e )   fiss = 1; // select fission blob in tPPAC vs E_SiRi gate
+                    ////        if ( CheckPPACbgGate(ppac_t_c)     &&  fission_excitation_energy_min[0] < e )   fiss = 2; // added these to also see background fissions
+
+                    for (int k = 0 ; k < NUM_PPAC ; ++k){
+                        for (int l = 0 ; l < event.n_ppac[k] ; ++l){
+                            ppac_word = event.w_ppac[k][l];
+
+                            tdiff_ppac_labr = CalcTimediff(ppac_word, event.w_labr[i][j]);
+                            time_ppac_labr[k]->Fill(tdiff_ppac_labr, i);
+                            time_energy_ppac_labr[k]->Fill(tdiff_ppac_labr, labr_energy);
+
+                            tdiff_ppac_de = CalcTimediff(ppac_word, de_word);
+                            time_ppac_de[k]->Fill(tdiff_ppac_de, GetDetector(de_word.address).detectorNum);
+                            time_energy_ppac_de[k]->Fill(tdiff_ppac_de, de_energy);
+
+                            if (tdiff_ppac_labr > labr_time_cut.lower_prompt && tdiff_ppac_labr < labr_time_cut.higher_prompt){
+                                alfna_ppac->Fill(labr_energy, ex);
+                            }
+                            else if (tdiff_ppac_labr > labr_time_cut.lower_bg && tdiff_ppac_labr < labr_time_cut.higher_bg){
+                                alfna_ppac->Fill(labr_energy, ex, -1);
+                                alfna_bg_ppac->Fill(labr_energy, ex, 1);
+                            }
+
+                        }
                     }
 
                 }
