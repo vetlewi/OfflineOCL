@@ -1,17 +1,65 @@
-
-
 # Importing the gain shit information.
-Gain file /Users/vetlewi/Documents/coding/OfflineOCL/input_files/gain_shift.dat
+Gain file /home/fabiobz/Desktop/Masterthesis/240Pu/preexperiment/OfflineOCL/input_files/gain_shift.dat
+range /home/fabiobz/Desktop/Masterthesis/240Pu/preexperiment/OfflineOCL/input_files/zrange_p.dat
 
-range /Users/vetlewi/Documents/coding/OfflineOCL/input_files/zrange_p.dat
+# Parameters for the range curve, 3He or alpha
+#rangefile zrange_he3.dat
+#rangefile zrange_a.dat
+#rangefile zrange_d.dat
+#rangefile zrange_p.dat
+
+## Cut of low-energy events by making a rectangle which is excluded
+## in the down, left corner of the banana. 
+## Contains E-minimum 1, DE-minimum 1, E-minimum 2, DE-minimum 2.
+## Including Z=1 particles:
+# parameter ede_rect  = 500 250 30 500
+## Excluding Z=1 particles:
+## parameter ede_rect  = 500 2500 2000 2500
+
+# Thickness gate 
+# Format: lower cut, upper cut
+# for proton banana
+#parameter thick_range = 110 140
+parameter thick_range = 160 240 ## Just for test purposes!
+
+# for deuteron banana
+# parameter thick_range = XX YY
+
+# Kinematics: Fit of qkinz
+# Give paramters in MeV^(-x), not keV
+parameter ex_from_ede    = 14.5 -1.0436 -0.001220 \
+14.5 -1.0411 -0.001220 \
+14.5 -1.0384 -0.001220 \
+14.5 -1.0355 -0.001220 \
+14.5 -1.0286 -0.001220 \
+14.5 -1.0252 -0.001220 \
+14.5 -1.0216 -0.001220 \
+14.5 -1.0177 -0.001220 \
+
+
+# labbr time gates, for making the ALFNA matrices 
+# found by looking at the m_nai_t plot and projecting it
+# down to the x-axis/m_nai_e_t_c x-axis plot 
+# remember to subtract the same amount of channels 
+# as the ones that are filled, and make sure you "hit" a top!
+# parameter = lower cut of prompt ,     higher gate of prompt peak,  \
+#             lower cut on backgr.,     higher cut backgr.
+parameter labr_time_cuts = -1 10 \
+                          59 70                     
+
+################ Only when PPACs are used ##################################
+# PPAC time gates
+# time gates of the ppacs are found from the fission blob 
+# in the m_siri_e_t_ppac plot (fission blob in tPPAC vs E_SiRi gate)
+# - time gates from the y-axis, and energy from the x-axis
+# parameter = lower cut of prompt ,     higher gate of prompt peak,  \
+#             lower cut on backgr.,     higher cut backgr.
+parameter ppac_time_cuts = 190 200 \
+                           290 300
+############################################################################
 
 # Now we will need to read files... There is a lot of the :O
-data directory /Volumes/FAST/listmode_6April
+data directory /home/fabiobz/Desktop/Masterthesis/240Pu/preexperiment/OfflineOCL/data
 data file sirius-20180406-124747.data
-data file sirius-20180406-124747-big-000.data
-#data file sirius-20180406-124747-big-001.data
-#data file sirius-20180406-124747-big-002.data
-#data file sirius-20180406-124747-big-003.data
-#data file sirius-20180406-124747-big-004.data
 
-export root  /Users/vetlewi/Documents/coding/OfflineOCL/output_files/beam_test.root
+export root  /home/fabiobz/Desktop/Masterthesis/240Pu/preexperiment/OfflineOCL/output_files/28Si_test.root
