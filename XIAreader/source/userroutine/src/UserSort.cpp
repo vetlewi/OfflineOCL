@@ -245,13 +245,13 @@ void UserSort::CreateSpectra()
     for (int i = 0 ; i < NUM_LABR_DETECTORS ; ++i){
 
         // Create energy spectra
-        sprintf(tmp, "energy_raw_labr_%02d", i);
+        sprintf(tmp, "energy_raw_labr_%02d", i+1);
         energy_labr_raw[i] = Spec(tmp, tmp, 32768, 0, 32768, "Energy [ch]");
 
-        sprintf(tmp, "energy_labr_%02d", i);
+        sprintf(tmp, "energy_labr_%02d", i+1);
         energy_labr[i] = Spec(tmp, tmp, 10000, 0, 10000, "Energy [keV]");
 
-        sprintf(tmp, "time_labr_%02d", i);
+        sprintf(tmp, "time_labr_%02d", i+1);
         time_labr[i] = Spec(tmp, tmp, 5000, -2500, 2500, "Time t_{LaBr} - t_{#Delta E} [ns]");
 
     }
