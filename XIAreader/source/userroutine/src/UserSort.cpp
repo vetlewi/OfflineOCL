@@ -367,7 +367,8 @@ bool UserSort::Sort(const Event &event)
     unsigned int e_seg=0;
     unsigned int de_seg=0;
     word_t e_word, de_word, ppac_word;
-
+    word_t de_words[32]; // DE-words...
+    int n_de_words=0;
     NameTimeParameters();
 
     for ( i = 0 ; i < NUM_LABR_DETECTORS ; ++i ){
@@ -414,11 +415,24 @@ bool UserSort::Sort(const Event &event)
 //        }
 //    }
 
+    for (i = 8*GetDetector(event.trigger.address).telNum ; i < 8*(GetDetector(event.trigger.address).telNum+1) ; ++i){
+        for (j = 0 ; j < event.n_dEdet[i] ; ++j){
+
+            tdiff = CalcTimediff(event.trigger, event.w_dEdet[i][j]);
+            time_e_de[GetDetector(event.trigger.address).telNum]->Fill(tdiff, i - 8*GetDetector(event.trigger.address).telNum);
+
+            if (n_de_words < 256)
+                de_words[n_de_words++] = event.w_dEdet[i][j];
+        }
+
+    }
+
 
     // Check if only one SiRi combination fired
-    if (event.tot_dEdet == 1 && event.tot_Edet == 1 // Check if one and only one E & dE has fired
-            && GetDetector(de_word.address).telNum == GetDetector(e_word.address).telNum // And(!) require that dE and E are on the same pad
-            && de_word.cfdfail == 0){ // Note: don't take event if cfd correction failed
+    if ( n_de_words == 1){ // Note: don't take event if cfd correction failed
+
+        e_word = event.trigger;
+        de_word = de_words[0];
 
         // Note: We can take the word assigned above -- if several E or dE detectors had fired, several
         //       words would be assigned. However, we anyhow demand that only one detectors had fired
