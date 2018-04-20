@@ -82,6 +82,9 @@ struct Event {
     int length;  //! Total length of the event (in no. of words)
 
 
+    subevent_t trigger;
+
+
     //! Constructor
     Event() { Reset(); }
 

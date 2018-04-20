@@ -121,6 +121,8 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
             int start = i;
             int stop = i+1;
 
+            event.trigger = cWord;
+
             // We will move back a given number of words and check timestamps
             for (int j = i ; j > 0 ; --j){
                 timediff = (*buffer)[j-1].timestamp - cWord.timestamp;
@@ -138,7 +140,7 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
                 }
             }
 
-            curr_Buf = stop;
+            curr_Buf = i+1;
             n_data = stop-start;
             return PackEvent(event, start, stop);
         }
