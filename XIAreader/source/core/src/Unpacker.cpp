@@ -38,7 +38,7 @@
 #include <string>
 #include <cstdlib>
 
-#define GAP_SIZE 100
+#define GAP_SIZE 1000
 
 Unpacker::Unpacker()
 	: buffer( 0 )
@@ -78,7 +78,7 @@ Unpacker::Status Unpacker::Next(Event &event)
 	return OKAY;
 }
 #if SINGLES
-bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
+/*bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
 {
 
     event.Reset();
@@ -104,6 +104,29 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
         stop = buffer->GetSize();
         curr_Buf = stop;
         return PackEvent(event, start, stop);
+}*/
+
+bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
+{
+
+    event.Reset();
+
+        if ( curr_Buf >= buffer->GetSize() )
+            return false;
+
+        int64_t timediff;
+        int start = curr_Buf;
+        int stop = curr_Buf+1;
+
+        for (int i = curr_Buf ; i < buffer->GetSize() ; ++i){
+            timediff = (*buffer)[i+1].timestamp - (*buffer)[curr_Buf].timestamp;
+            if (timediff > GAP_SIZE){
+                stop = i+1;
+                break;
+            }
+        }
+        curr_Buf = stop;
+        return PackEvent(event, start, stop);
 }
 #else
 bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
@@ -114,7 +137,7 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
         return false;
 
     int64_t timediff;
-    word_t cWord;
+    word_t cWord, cword_2;
     for (int i =  curr_Buf ; i < buffer->GetSize() ; ++i){
         cWord = (*buffer)[i];
         if (GetDetector(cWord.address).type == eDet){
@@ -125,7 +148,8 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
 
             // We will move back a given number of words and check timestamps
             for (int j = i ; j > 0 ; --j){
-                timediff = (*buffer)[j-1].timestamp - cWord.timestamp;
+                cword_2 = (*buffer)[j-1];
+                timediff = cword_2.timestamp - cWord.timestamp;
                 if (abs(timediff) > 500){
                     start = j;
                     break;
@@ -133,7 +157,8 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
             }
 
             for (int j = i ; j < buffer->GetSize() - 1 ; ++j){
-                timediff = (*buffer)[j+1].timestamp - cWord.timestamp;
+                cword_2 = (*buffer)[j+1];
+                timediff = cword_2.timestamp - cWord.timestamp;
                 if (abs(timediff) > 1500){
                     stop = j+1;
                     break;

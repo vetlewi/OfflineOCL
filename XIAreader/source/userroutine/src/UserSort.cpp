@@ -389,7 +389,8 @@ bool UserSort::Sort(const Event &event)
     n_tot_e += event.tot_Edet;
     n_tot_de += event.tot_dEdet;
     tot += 1;
-
+    word_t de_words[32]; // DE-words...
+    int n_de_words=0;
     NameTimeParameters();
 
     for ( i = 0 ; i < NUM_LABR_DETECTORS ; ++i ){
@@ -434,9 +435,24 @@ bool UserSort::Sort(const Event &event)
 //        }
 //    }
 
+    for (i = 8*GetDetector(event.trigger.address).telNum ; i < 8*(GetDetector(event.trigger.address).telNum+1) ; ++i){
+        for (j = 0 ; j < event.n_dEdet[i] ; ++j){
 
-    word_t de_words[256];
-    int n_de_words = 0;
+            tdiff = CalcTimediff(event.trigger, event.w_dEdet[i][j]);
+            time_e_de[GetDetector(event.trigger.address).telNum]->Fill(tdiff, i - 8*GetDetector(event.trigger.address).telNum);
+
+            if (n_de_words < 256)
+                de_words[n_de_words++] = event.w_dEdet[i][j];
+        }
+
+    }
+
+
+    // Check if only one SiRi combination fired
+    if ( n_de_words == 1){ // Note: don't take event if cfd correction failed
+
+        e_word = event.trigger;
+        de_word = de_words[0];
 
     for (i = 8*GetDetector(event.trigger.address).telNum ; i < 8*(GetDetector(event.trigger.address).telNum + 1) ; ++i){
         for (j = 0 ; j < event.n_dEdet[i] ; ++j){
