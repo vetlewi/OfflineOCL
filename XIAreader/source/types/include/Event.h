@@ -84,7 +84,7 @@ struct Event {
 
     subevent_t trigger;     //! This is the word that "triggers" the event.
 
-
+  
     //! Constructor
     Event() { Reset(); }
 

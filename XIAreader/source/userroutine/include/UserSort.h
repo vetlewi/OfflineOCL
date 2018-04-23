@@ -64,6 +64,10 @@ private:
 
     Histogram2Dp time_energy_labr;
     Histogram2Dp time_energy_ppac_labr[NUM_PPAC]; // ppac_gated
+    Histogram2Dp time_energy_ppac_labr_00, time_energy_ppac_labr_08; // ppac_gated
+
+    Histogram2Dp time_walltime_ppac_labr_01, time_walltime_ppac_labr_06;
+
 
     Histogram2Dp time_ppac_de[NUM_PPAC];
     Histogram2Dp time_energy_ppac_de[NUM_PPAC];
@@ -143,6 +147,9 @@ private:
 
 
     int n_fail_de, n_fail_e;
+
+    int n_tot_e, n_tot_de;
+    int tot;
 
 
 };
