@@ -1,18 +1,47 @@
 # Importing the gain shit information.
-Gain file /Users/vetlewi/Documents/coding/OfflineOCL/input_files/gain_shift_Si.dat
+Gain file /Users/vetlewi/Documents/coding/OfflineOCL/input_files/Gain_shift_Si.dat
 
 range /Users/vetlewi/Documents/coding/OfflineOCL/input_files/zrange_p.dat
 
-parameter thick_range = 120 300
+parameter thick_range = 120 160
+
+parameter ex_from_ede = \
+17.839431 -1.048925 -0.000605 \
+17.841066 -1.046072 -0.000668 \
+17.843065 -1.043250 -0.000727 \
+17.844440 -1.040309 -0.000787 \
+17.843421 -1.036914 -0.000862 \
+17.842488 -1.033552 -0.000933 \
+17.840488 -1.030053 -0.001005 \
+17.836852 -1.026316 -0.001082
+
+parameter labr_time_cuts = -6.0 6.0 39 51
+
 
 # Now we will need to read files... There is a lot of the :O
 data directory /Users/vetlewi/Desktop/Si_calib
 data file sirius-20180416-142401.data
 data file sirius-20180416-142401-big-000.data
-#data file sirius-20180416-145040.data
-#data file sirius-20180416-145040-big-000.data
-#data file sirius-20180416-145040-big-001.data
-#data file sirius-20180416-145040-big-002.data
-#data file sirius-20180416-145040-big-003.data
+
+# XIA was restarted between the two files. New time alignment!
+parameter shift_time_de = \
+327.537 338.864 327.054 339.71 327.815 334.929 332.649 340.258 \
+328.463 339.869 331.35 340.089 328.149 332.593 327.135 336.448 \
+329.84 334.072 333.694 333.525 325.97 333.712 334.474 334.782 \
+331.219 330.073 330.414 330.593 330.266 330.383 330.857 334.761 \
+331.263 331.866 330.385 335.46 330.414 334.574 334.407 335.606 \
+327.23 339.244 327.577 334.515 330.634 334.915 333.854 333.889 \
+329.586 340.863 333.006 341.243 328.74 340.101 332.564 341.691 \
+333.065 330.851 336.037 336.562 332.765 335.452 336.509 332.64
+
+parameter shift_time_labr = \
+-0.0 2.83594 6.3607 -0.0452515 4.90426 6.88002 9.2844 -9.23324 -1.14762 4.72269 3.66338 -3.87358 -6.08768 2.33037 3.56141 3.5 \
+3.57546 6.84292 6.5 -2.88262 4.82363 -4.3589 -5.81779 -3.39334 -0.176974 9.42393 9.5 -2.7634 7.64186 2.91902 -0.858823 -0.5
+
+data file sirius-20180416-145040.data
+data file sirius-20180416-145040-big-000.data
+data file sirius-20180416-145040-big-001.data
+data file sirius-20180416-145040-big-002.data
+data file sirius-20180416-145040-big-003.data
 
 export root  /Users/vetlewi/Documents/coding/OfflineOCL/output_files/Si_calib.root

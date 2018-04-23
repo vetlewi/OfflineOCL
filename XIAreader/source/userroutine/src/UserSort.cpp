@@ -296,7 +296,7 @@ void UserSort::CreateSpectra()
             // Make excitation spectra.
             sprintf(tmp, "h_ex_b%d_f%d", i, j);
             sprintf(tmp2, "Singles excitation spectrum, pad %d, ring %d", i, j);
-            h_ex[i][j] = Spec(tmp, tmp2, 15000, 0, 15000, "Excitation energy [keV]");
+            h_ex[i][j] = Spec(tmp, tmp2, 20000, 0, 20000, "Excitation energy [keV]");
         }
     }
 
@@ -327,7 +327,7 @@ void UserSort::CreateSpectra()
 
     sprintf(tmp, "h_ex_all");
     sprintf(tmp2, "Excitation energy, all");
-    h_ex_all = Spec(tmp, tmp2, 15000, 0, 15000, "Excitation energy [keV]");
+    h_ex_all = Spec(tmp, tmp2, 20000, 0, 20000, "Excitation energy [keV]");
 
     sprintf(tmp, "alfna");
     alfna = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
@@ -466,7 +466,7 @@ bool UserSort::Sort(const Event &event)
 
 
             double ex = ex_from_ede[3*ring]; // Constant part.
-            ex += ex_from_ede[3*ring + 1]*(e_tot)*1-3; // Linear part.
+            ex += ex_from_ede[3*ring + 1]*(e_tot*1e-3); // Linear part.
             ex += ex_from_ede[3*ring + 2]*( e_tot*1e-3 )*( e_tot*1e-3 ); // Quadratic term.
             ex *= 1000; // Back to keV units!
 
@@ -511,6 +511,7 @@ void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,cons
                     break;
                 }
                 case is_background : {
+                    alfna->Fill(energy, excitation, -1);
                     alfna_bg->Fill(energy, excitation);
                     break;
                 }
