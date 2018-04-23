@@ -43,6 +43,18 @@ protected:
     void CreateSpectra();
 
 private:
+
+    // Enum describing the 'prompt' status of a gamma-ray
+    typedef enum {
+        is_prompt,          //!< To indicate that the hit is within the 'prompt' window.
+        is_background,      //!< To indicate that the hit is within the 'background' window.
+        ignore              //!< To indicate that the hit is neither in the 'prompt' nor the 'background window.
+    } prompt_status_t;
+
+    // Method to check if the time is within a gate.
+    prompt_status_t CheckTimeStatus(const double &time,         /*!< Time of the hit        */
+                                    const Parameter &paramter   /*!< Gates of the detector  */) const;
+
     // Method to give names to some paramters
     void NameTimeParameters();
 
@@ -51,6 +63,16 @@ private:
 
     // Method for getting time difference between two words.
     double CalcTimediff(const word_t &start, const word_t &stop) const;
+
+    // Method for analyzing and checking conincident gamma events.
+    void AnalyzeGamma(const word_t &de_word,    /*!< We need the de_word for the start time         */
+                      const double &excitation, /*!< We need the reconstructed excitation energy    */
+                      const Event &event        /*!< Event structure.                               */);
+
+    // Method for analyzing and checking coinicident gamma-ppac events.
+    void AnalyzeGammaPPAC(const word_t &de_word,    /*!< We need the de_word for the start time         */
+                          const double &excitation, /*!< We need the reconstructed excitation energy    */
+                          const Event &event        /*!< Event structure.                               */);
 
     Histogram1Dp energy_labr_raw[NUM_LABR_DETECTORS], energy_labr[NUM_LABR_DETECTORS];
     Histogram1Dp energy_dE_raw[NUM_SI_DE_DET], energy_dE[NUM_SI_DE_DET];
@@ -137,7 +159,7 @@ private:
     double higher_bg;
     };
 
-    // Time gates for the NaI detectors, e.g. for making the ALFNA matrices
+    // Time gates for the LaBr detectors, e.g. for making the ALFNA matrices
     Parameter labr_time_cuts;
     TimeGate labr_time_cut;
 

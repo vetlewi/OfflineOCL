@@ -38,9 +38,10 @@
 #include <vector>
 #include <fstream>
 
-//#include <printf.h>
 #include <stdint.h>
 #include <stdlib.h>
+
+#define FISSION 0
 
 static bool set_par(Parameters& parameters, std::istream& ipar,
                     const std::string& name, int size)
@@ -381,18 +382,17 @@ bool UserSort::Sort(const Event &event)
 {
     int i, j;
     double energy;
-    double tdiff, tdiff_ppac_labr, tdiff_ppac_de;
-    unsigned int e_seg=0;
-    unsigned int de_seg=0;
-    word_t e_word, de_word, ppac_word;
+    double tdiff;
 
     n_tot_e += event.tot_Edet;
     n_tot_de += event.tot_dEdet;
     tot += 1;
-    word_t de_words[32]; // DE-words...
-    int n_de_words=0;
-    NameTimeParameters();
 
+
+    word_t de_words[32]; // List of dE hits from pads in front of the trigger E word.
+    int n_de_words=0;
+
+    // First fill some 'singles' spectra.
     for ( i = 0 ; i < NUM_LABR_DETECTORS ; ++i ){
         for ( j = 0 ; j < event.n_labr[i] ; ++j ){
             energy_labr_raw[i]->Fill(event.w_labr[i][j].adcdata);
@@ -407,8 +407,7 @@ bool UserSort::Sort(const Event &event)
             energy_dE_raw[i]->Fill(event.w_dEdet[i][j].adcdata);
             energy = CalibrateE(event.w_dEdet[i][j]);
             energy_dE[i]->Fill(energy);
-            de_word = event.w_dEdet[i][j];
-            if (de_word.cfdfail > 0)
+            if (event.w_dEdet[i][j].cfdfail > 0) // For 'statistical' purposes!
                 ++n_fail_de;
         }
     }
@@ -418,22 +417,20 @@ bool UserSort::Sort(const Event &event)
             energy_E_raw[i]->Fill(event.w_Edet[i][j].adcdata);
             energy = CalibrateE(event.w_Edet[i][j]);
             energy_E[i]->Fill(energy);
-            e_word = event.w_Edet[i][j];
-            if (e_word.cfdfail > 0)
+            if (event.w_Edet[i][j].cfdfail > 0) // For 'statistical' purposes!
                 ++n_fail_e;
         }
     }
 
-//    for (i = 0 ; i < NUM_PPAC ; ++i){
-//        for (int j = 0 ; j < event.n_ppac[i] ; ++j){
-//            for (int n = 0 ; n < NUM_LABR_DETECTORS ; ++n){
-//                for ( int m = 0 ; m < event.n_labr[n] ; ++m){
-//                    tdiff = CalcTimediff(event.w_ppac[i][j], event.w_labr[n][m]);
-//                    time_ppac_labr[i]->Fill(tdiff, n);
-//                }
-//            }
-//        }
-//    }
+    // We know that DE addresses should be as following:
+    // 0 - 7: With E address 0.
+    // 8 - 15: With E address 1.
+    // 16 - 23: With E address 2.
+    // 24 - 31: With E address 3.
+    // 32 - 39: With E address 4.
+    // 40 - 47: With E address 5.
+    // 48 - 55: With E address 6.
+    // 56 - 63: With E address 7.
 
     for (i = 8*GetDetector(event.trigger.address).telNum ; i < 8*(GetDetector(event.trigger.address).telNum+1) ; ++i){
         for (j = 0 ; j < event.n_dEdet[i] ; ++j){
@@ -448,160 +445,202 @@ bool UserSort::Sort(const Event &event)
     }
 
 
-    // Check if only one SiRi combination fired
-    if ( n_de_words == 1){ // Note: don't take event if cfd correction failed
+    // Check if only one dE detector of the trapezoidal has fired.
+    if ( n_de_words == 1){
 
-        e_word = event.trigger;
-        de_word = de_words[0];
+        word_t e_word = event.trigger;
+        word_t de_word = de_words[0];
 
-    for (i = 8*GetDetector(event.trigger.address).telNum ; i < 8*(GetDetector(event.trigger.address).telNum + 1) ; ++i){
-        for (j = 0 ; j < event.n_dEdet[i] ; ++j){
 
-            if (n_de_words < 256)
-                de_words[n_de_words++] = event.w_dEdet[i][j];
+        // The ring number and telescope number.
+        unsigned int ring = GetDetector(de_word.address).detectorNum % 8; // Later we should define what we divide by somewhere else...
+        unsigned int tel = GetDetector(e_word.address).telNum;
+
+        // Fill DE - E matrices.
+        ede_raw[tel][ring]->Fill(e_word.adcdata, de_word.adcdata);
+
+        double e_energy = CalibrateE(e_word);
+        double de_energy = CalibrateE(de_word);
+
+        ede[tel][ring]->Fill(e_energy, de_energy);
+        ede_all->Fill(e_energy, de_energy);
+
+        // Fill time spectra (for alignment? Need to determine what we need later)
+        tdiff = CalcTimediff(e_word, de_word);
+        time_e_de[tel]->Fill(tdiff, ring);
+
+
+        // Calculate 'apparent thickness'
+        double thick = range.GetRange(e_energy + de_energy) - range.GetRange(e_energy);
+        h_thick->Fill(thick);
+
+        // Check if correct particle.
+        if ( thick >= thick_range[0] && thick <= thick_range[1] ){
+
+            ede_thick->Fill(e_energy, de_energy);
+
+            // Calculate the excitation energy.
+            double e_tot = e_energy + de_energy;
+
+            // Filling 'total particle energy' spectrum.
+            h_ede[tel][ring]->Fill( e_tot );
+            h_ede_r[ring]->Fill( e_tot );
+            h_ede_all->Fill( e_tot );
+
+
+            double ex = ex_from_ede[3*ring]; // Constant part.
+            ex += ex_from_ede[3*ring + 1]*(e_tot)*1-3; // Linear part.
+            ex += ex_from_ede[3*ring + 2]*( e_tot*1e-3 )*( e_tot*1e-3 ); // Quadratic term.
+            ex *= 1000; // Back to keV units!
+
+
+            h_ex_r[ring]->Fill(ex);
+            h_ex->Fill(ex);
+
+            // Analyze gamma rays.
+        #if FISSION
+            AnalyzeGammaPPAC(de_word, ex, event);
+        #else
+            AnalyzeGamma(de_word, ex, event);
+        #endif // FISSION
+
         }
     }
 
+    return true;
+
+}
 
 
-    // Check if only one SiRi combination fired (<- comment still up to date?)
-    if ( n_de_words == 1){
+void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,const Event &event)
+{
 
-        e_word = event.trigger;
-        de_word = de_words[0];
+    // We will loop over all gamma-rays.
 
-        // Note: don't take event if cfd correction failed
-        // This will give us potentially give us better timing resoution, but "cost" some events
-        // Depending on the experiment, you may want to comment this off!
-//        if (de_word.cfdfail != 0){
+    for (int i = 0 ; i < NUM_LABR_DETECTORS ; ++i){
+        for (int j = 0 ; j < event.n_labr[i] ; ++j){
 
-            // Note: We can take the word assigned above -- if several E or dE detectors had fired, several
-            //       words would be assigned. However, we anyhow demand that only one detectors had fired
+            // Get energy and time of the gamma-ray.
 
-            int de_ring = GetDetector(de_word.address).detectorNum % NUM_SI_RINGS; // dE ring number
-            e_seg = GetDetector(e_word.address).telNum;
+            double energy = CalibrateE(event.w_labr[i][j]);
+            double tdiff = CalcTimediff(de_word, event.w_labr[i][j]);
 
+            // Fill time spectra.
+            time_labr[i]->Fill(tdiff);
+            time_labr_all->Fill(tdiff, i);
+            time_energy_labr->Fill(energy, tdiff);
 
-            ede_raw[e_seg][de_ring]->Fill(e_word.adcdata, de_word.adcdata);
+            // Check time gate.
+            switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {
+                case is_prompt : {
+                    alfna->Fill(energy, excitation);
+                    break;
+                }
+                case is_background : {
+                    alfna_bg->Fill(energy, excitation);
+                    break;
+                }
+                case ignore : {
+                    break;
+                }
+            }
+        }
+    }
+}
 
-            double e_energy = CalibrateE(e_word);
-            double de_energy = CalibrateE(de_word);
+void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation, const Event &event)
+{
 
-            ede_all->Fill(e_energy, de_energy);
+    // Things should be implemented here...
+    for (int i = 0 ; i < NUM_LABR_DETECTORS ; ++i){
+        for (int j = 0 ; j < event.n_labr[i] ; ++j){
 
-            ede[e_seg][de_ring]->Fill(e_energy, de_energy);
+            // Get energy and time of the gamma-ray.
 
-            // Time diff.
-            tdiff = CalcTimediff(e_word, de_word);
-            time_e_de[e_seg]->Fill(tdiff, de_ring);
+            double energy = CalibrateE(event.w_labr[i][j]);
+            double tdiff = CalcTimediff(de_word, event.w_labr[i][j]);
 
+            // Fill time spectra.
+            time_labr[i]->Fill(tdiff);
+            time_labr_all->Fill(tdiff, i);
+            time_energy_labr->Fill(energy, tdiff);
 
-            double thick = range.GetRange(e_energy+de_energy) - range.GetRange(e_energy);
-            h_thick->Fill(thick);
-
-            // particle tickness gate
-            if (thick >= thick_range[0] && thick <= thick_range[1]){
-                ede_thick->Fill(e_energy, de_energy);
-
-                double ex = ex_from_ede[3*de_ring+0] + ex_from_ede[3*de_ring+1]*(e_energy+de_energy)/1000. + ex_from_ede[3*de_ring+2]*pow((e_energy+de_energy)/1000.,2);
-                ex *= 1000; // MeV -> keV
-
-                h_ede[e_seg][de_ring]->Fill(e_energy + de_energy);
-                h_ede_r[de_ring]->Fill(e_energy + de_energy);
-                h_ede_all->Fill(e_energy + de_energy);
-
-                h_ex_r[de_ring]->Fill(ex);
-                h_ex->Fill(ex);
-
-                // Loop over gamma-rays
-                for (i = 0 ; i < NUM_LABR_DETECTORS ; ++i){ // Loop over detectors
-                    for (int j = 0 ; j < event.n_labr[i] ; ++j){ // Loop over events for each detector
-
-                        double labr_energy = CalibrateE(event.w_labr[i][j]);
-                        tdiff = CalcTimediff(de_word, event.w_labr[i][j]);
-
-                        time_labr[i]->Fill(tdiff);
-                        time_labr_all->Fill(tdiff,i);
-                        time_energy_labr->Fill(labr_energy, tdiff);
-                        //   time_de_labr[ GetDetector(de_word.address).detectorNum ]->Fill(tdiff, i);
-
-                        if (tdiff > labr_time_cut.lower_prompt && tdiff < labr_time_cut.higher_prompt){
-                            alfna->Fill(labr_energy, ex);
-                        }
-                        else if (tdiff > labr_time_cut.lower_bg && tdiff < labr_time_cut.higher_bg){
-                            alfna->Fill(labr_energy, ex, -1);
-                            alfna_bg->Fill(labr_energy, ex, 1);
-                        }
-
-                        // Fission related sorting
-
-                        // TODO(!!):
-                        // Copy from old sorting code:
-                        //// keep this outside the if defined statement, such that if no PPACs are used, all events are considered
-                        //// fiss = 0 -> by default, an event is not considered as a fission event; changed only if recognized in the for loop below
-                        // int fiss = 0;
-                        ////        if ( na_t_f>190 && na_t_f<220 && na_e_f>1195 && na_e_f<1225 ) fiss = 1;
-                        // // Fabio: don't want energy requirement at the moment
-                        ////        if ( CheckPPACpromptGate(ppac_t_c) &&  fission_excitation_energy_min[0] < e )   fiss = 1; // select fission blob in tPPAC vs E_SiRi gate
-                        ////        if ( CheckPPACbgGate(ppac_t_c)     &&  fission_excitation_energy_min[0] < e )   fiss = 2; // added these to also see background fissions
-
-                        for (int k = 0 ; k < NUM_PPAC ; ++k){
-                            for (int l = 0 ; l < event.n_ppac[k] ; ++l){
-                                ppac_word = event.w_ppac[k][l];
-
-                                tdiff_ppac_labr = CalcTimediff(ppac_word, event.w_labr[i][j]);
-                                time_ppac_labr[k]->Fill(tdiff_ppac_labr, i);
-                                time_energy_ppac_labr[k]->Fill(tdiff_ppac_labr, labr_energy);
-
-                                // Test: Try to detect whether there is a timewalk or synchornization error
-                                // NOT WORKING YET
-                                // Currently, it takes the "walltime" from the listtime timestamp. The time stamps there
-                                // are currently reset every time one clicks "start" (/stop) in the aquisition software.
-                                // Thus, during the 240Pu experiment, we had several times a resynchronization, which means
-                                // in turn a potential misalignment for the next file
-                                // We'll work on some method to correct for this.
-                                if(i==0)
-                                    time_walltime_ppac_labr_01->Fill(tdiff_ppac_labr,ppac_word.timestamp);
-                                if(i==5)
-                                    time_walltime_ppac_labr_06->Fill(tdiff_ppac_labr,ppac_word.timestamp);
-
-
-
-
-    //                            if (tdiff_ppac_labr > ppac_time_cut.lower_prompt && tdiff_ppac_labr < ppac_time_cut.higher_prompt){
-                                    if(i==0)
-                                        time_energy_ppac_labr_00->Fill(tdiff_ppac_labr, labr_energy);
-                                    if(i==8)
-                                        time_energy_ppac_labr_08->Fill(tdiff_ppac_labr, labr_energy);
-    //                            }
-
-
-                                tdiff_ppac_de = CalcTimediff(ppac_word, de_word);
-                                time_ppac_de[k]->Fill(tdiff_ppac_de, GetDetector(de_word.address).detectorNum);
-                                time_energy_ppac_de[k]->Fill(tdiff_ppac_de, de_energy);
-
-                                // Gate on the prompt fission gamma rays
-                                // Important: Not yet propperly bg subtracted
-                                if (tdiff_ppac_labr > ppac_time_cut.lower_prompt && tdiff_ppac_labr < ppac_time_cut.higher_prompt){
-                                    alfna_ppac->Fill(labr_energy, ex);
-                                }
-                                else if (tdiff_ppac_labr > ppac_time_cut.lower_bg && tdiff_ppac_labr < ppac_time_cut.higher_bg){
-                                    alfna_ppac->Fill(labr_energy, ex, -1);
-                                    alfna_bg_ppac->Fill(labr_energy, ex, 1);
-                                }
-                            }
-                        }
-                    }
-
+            // Check time gate.
+            switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {
+                case is_prompt : {
+                    alfna->Fill(energy, excitation);
+                    break;
+                }
+                case is_background : {
+                    alfna_bg->Fill(energy, excitation);
+                    break;
+                }
+                case ignore : {
+                    break;
                 }
             }
 
-//        }
 
+            for (int k = 0 ; k < NUM_PPAC ; ++k){
+                for (int l = 0 ; l < event.n_ppac[k] ; ++l){
+                    word_t ppac_word = event.w_ppac[k][l];
+
+                    double tdiff_ppac_labr = CalcTimediff(ppac_word, event.w_labr[i][j]);
+                    time_ppac_labr[k]->Fill(tdiff_ppac_labr, i);
+                    time_energy_ppac_labr[k]->Fill(tdiff_ppac_labr, energy);
+
+                    // Test: Try to detect whether there is a timewalk or synchornization error
+                    // NOT WORKING YET
+                    // Currently, it takes the "walltime" from the listtime timestamp. The time stamps there
+                    // are currently reset every time one clicks "start" (/stop) in the aquisition software.
+                    // Thus, during the 240Pu experiment, we had several times a resynchronization, which means
+                    // in turn a potential misalignment for the next file
+                    // We'll work on some method to correct for this.
+                    if(i==0)
+                        time_walltime_ppac_labr_01->Fill(tdiff_ppac_labr,ppac_word.timestamp);
+                    if(i==5)
+                        time_walltime_ppac_labr_06->Fill(tdiff_ppac_labr,ppac_word.timestamp);
+
+
+
+                    if (tdiff_ppac_labr > ppac_time_cut.lower_prompt && tdiff_ppac_labr < ppac_time_cut.higher_prompt){
+                        if(i==0)
+                            time_energy_ppac_labr_00->Fill(tdiff_ppac_labr, energy);
+                        if(i==8)
+                            time_energy_ppac_labr_08->Fill(tdiff_ppac_labr, energy);
+                    }
+
+
+                    double tdiff_ppac_de = CalcTimediff(ppac_word, de_word);
+                    time_ppac_de[k]->Fill(tdiff_ppac_de, GetDetector(de_word.address).detectorNum);
+                    time_energy_ppac_de[k]->Fill(tdiff_ppac_de, CalibrateE(de_word));
+
+                    // Gate on the prompt fission gamma rays
+                    // Important: Not yet propperly bg subtracted
+                    if (tdiff_ppac_labr > ppac_time_cut.lower_prompt && tdiff_ppac_labr < ppac_time_cut.higher_prompt){
+                        alfna_ppac->Fill(energy, excitation);
+                    }
+                    else if (tdiff_ppac_labr > ppac_time_cut.lower_bg && tdiff_ppac_labr < ppac_time_cut.higher_bg){
+                        alfna_ppac->Fill(energy, excitation, -1);
+                        alfna_bg_ppac->Fill(energy, excitation, 1);
+                    }
+                }
+            }
+        }
     }
+}
 
 
-    return true;
+
+
+UserSort::prompt_status_t UserSort::CheckTimeStatus(const double &time, const Parameter &parameter) const
+{
+    if ( time > parameter[0] && time < parameter[1])
+        return is_prompt;
+    else if (time > parameter[2] && time < parameter[3])
+        return is_background;
+    else
+        return ignore;
 }
 
 bool UserSort::End()
@@ -609,7 +648,7 @@ bool UserSort::End()
     std::cout << "Stats info: " << std::endl;
     std::cout << "CFD fails in E - detectors: " << n_fail_e << std::endl;
     std::cout << "CFD fails in dE - detectors: " << n_fail_de << std::endl;
-    std::cout << "Average number of dE words: " << n_tot_de/(double)tot << std::endl;
-    std::cout << "Average number of E words: " << n_tot_e/(double)tot << std::endl;
+    std::cout << "Average number of dE words: " << n_tot_de/double(tot) << std::endl;
+    std::cout << "Average number of E words: " << n_tot_e/double(tot) << std::endl;
     return true;
 }
