@@ -150,7 +150,7 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
             for (int j = i ; j > 0 ; --j){
                 cword_2 = (*buffer)[j-1];
                 timediff = cword_2.timestamp - cWord.timestamp;
-                if (abs(timediff) > 500){
+                if (abs(timediff) > 1500){
                     start = j;
                     break;
                 }

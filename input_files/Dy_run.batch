@@ -1,7 +1,9 @@
 # Importing the gain shit information.
-Gain file /Users/vetlewi/Documents/coding/OfflineOCL/input_files/gain_shift_new.dat
+Gain file /Users/vetlewi/Documents/coding/OfflineOCL/input_files/gain_shift_done.dat
 
 range /Users/vetlewi/Documents/coding/OfflineOCL/input_files/zrange_p.dat
+
+parameter thick_range = 120 300
 
 # Now we will need to read files... There is a lot of the :O
 data directory /Users/vetlewi/Desktop/Si_calib

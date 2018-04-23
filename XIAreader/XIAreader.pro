@@ -7,7 +7,7 @@ CONFIG -= qt
 ROOTFLAGS = $$system( root-config --cflags )
 ROOTLIBS = $$system( root-config --glibs )
 
-QMAKE_CXXFLAGS = $$ROOTFLAGS -Wall -W -std=c++11 -O3 -march=native -fPIC -m64
+QMAKE_CXXFLAGS = $$ROOTFLAGS -Wall -W -std=c++11 -fPIC -m64 -O3 -march=native
 QMAKE_CFLAGS += -Wall -W -fPIC -m64 -O3 -march=native
 LIBS += $$ROOTLIBS
 
