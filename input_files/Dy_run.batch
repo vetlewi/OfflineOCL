@@ -1,0 +1,12 @@
+# Importing the gain shit information.
+Gain file /Users/vetlewi/Documents/coding/OfflineOCL/input_files/gain_shift_new.dat
+
+range /Users/vetlewi/Documents/coding/OfflineOCL/input_files/zrange_p.dat
+
+# Now we will need to read files... There is a lot of the :O
+data directory /Users/vetlewi/Desktop/Si_calib
+data file sirius-20180420-143428.data
+data file sirius-20180420-154426.data
+data file sirius-20180420-173117.data
+
+export root  /Users/vetlewi/Documents/coding/OfflineOCL/output_files/beam_Dy.root
