@@ -439,8 +439,8 @@ bool UserSort::Sort(const Event &event)
 
         // Seems like we may have some issues with the dE rings 6 & 7 (0-7). We will end our
         // sorting here if we have either 6 or 7.
-        if (ring == 6 || ring == 7)
-            return true;
+        //if (ring == 6 || ring == 7)
+        //    return true;
 
         ede_all->Fill(e_energy, de_energy);
 
