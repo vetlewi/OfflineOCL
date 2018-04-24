@@ -242,7 +242,7 @@ void UserSort::CreateSpectra()
         energy_labr[i] = Spec(tmp, tmp, 10000, 0, 10000, "Energy [keV]");
 
         sprintf(tmp, "energy_time_labr_%02d", i+1);
-        energy_time_labr[i] = Mat(tmp, tmp, 1000, 0, 16000, "Energy [keV]", 2000, -100, 100, "Time difference [ns]");
+        energy_time_labr[i] = Mat(tmp, tmp, 1000, 0, 16000, "LaBr energy [keV]", 2000, -100, 100, "Time difference [ns]");
     }
 
     // Allocating the dE 'singles' spectra
@@ -440,13 +440,6 @@ bool UserSort::Sort(const Event &event)
 
         ede_all->Fill(e_energy, de_energy);
 
-
-        for (i = 0 ; i < NUM_LABR_DETECTORS ; ++i){
-            for (j = 0 ; j < event.n_labr[i] ; ++j){
-                energy_time_labr[i]->Fill(CalibrateE(event.w_labr[i][j]), CalcTimediff(de_word, event.w_labr[i][j]));
-            }
-        }
-
         // Calculate 'apparent thickness'
         double thick = range.GetRange(e_energy + de_energy) - range.GetRange(e_energy);
         h_thick->Fill(thick);
@@ -503,6 +496,7 @@ void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,cons
 
             // Fill time spectra.
             labr_align_time->Fill(tdiff, i);
+            energy_time_labr[i]->Fill(energy, tdiff);
 
             // Check time gate.
             switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {

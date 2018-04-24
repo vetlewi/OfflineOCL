@@ -2,7 +2,7 @@
 
 void GetPeaks()
 {
-	TFile *file = TFile::Open("Si_calib.root");
+	TFile *file = TFile::Open("beam_Dy.root");
 
 	TH2 *m = (TH2 *)file->Get("de_align_time");
 
