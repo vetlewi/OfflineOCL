@@ -2,7 +2,7 @@
 
 void GetPeaks_LaBr()
 {
-	TFile *file = TFile::Open("beam_Dy.root");
+	TFile *file = TFile::Open("Si_calib.root");
 
 	TH2 *m = (TH2 *)file->Get("labr_align_time");
 
@@ -23,7 +23,7 @@ void GetPeaks_LaBr()
 		//peakPos[i-1] = spec.GetPositionX()[0];
 
 		double param[3] = {200., spec.GetPositionX()[0], 1.0};
-		TF1 *fit = new TF1("total","gaus(0)",spec.GetPositionX()[0]-2.0,spec.GetPositionX()[0]+2.0);
+		TF1 *fit = new TF1("total","gaus(0)",spec.GetPositionX()[0]-4.0,spec.GetPositionX()[0]+1.5);
 		
 		for (Int_t k=0; k<3; k++) {
         fit->SetParameter(k, param[k]);
@@ -34,8 +34,13 @@ void GetPeaks_LaBr()
 		fit->Draw("same");
 
 	}
-
-	for (int i = 0 ; i < 32 ; ++i){
+	int n = 1;
+	cout << "0 ";
+	for (int i = 1 ; i < 32 ; ++i){
+		if ( i / 16 == n ){
+			cout << '\\' << endl;
+			++n;
+		}
 		cout << -peakPos[i] << " ";
 	}
 

@@ -303,11 +303,15 @@ void UserSort::CreateSpectra()
     // Time spectra (except those 'listed')
     sprintf(tmp, "de_align_time");
     sprintf(tmp2, "t_{dE} - t_{LaBr nr. 1}");
-    de_align_time = Mat(tmp, tmp2, 30000, -1500, 1500, "t_{dE} - t_{LaBr nr. 1} [ns]", NUM_SI_DE_DET, 0, NUM_SI_DE_DET, "#Delta E detector id.");
+    de_align_time = Mat(tmp, tmp2, 3000, -1500, 1500, "t_{dE} - t_{LaBr nr. 1} [ns]", NUM_SI_DE_DET, 0, NUM_SI_DE_DET, "#Delta E detector id.");
 
     sprintf(tmp, "labr_align_time");
     sprintf(tmp2, "t_{LaBr} - t_{dE ANY}");
     labr_align_time = Mat(tmp, tmp2, 3000, -1500, 1500, "t_{LaBr} - t_{dE ANY} [ns]", NUM_LABR_DETECTORS, 0, NUM_LABR_DETECTORS, "LaBr detector id.");
+
+    sprintf(tmp, "energy_time_labr_all");
+    sprintf(tmp2, "E_{LaBr} : t_{LaBr} - t_{dE ANY}, all");
+    energy_time_labr_all = Mat(tmp, tmp2, 2000, 0, 16000, "Energy LaBr [keV]", 2000, -50, 50, "t_{LaBr} - t_{DE} [ns]");
 
     sprintf(tmp, "ede_all");
     sprintf(tmp2, "E : DE, all");
@@ -414,7 +418,7 @@ bool UserSort::Sort(const Event &event)
 
         // The ring number and telescope number.
         unsigned int ring = GetDetector(de_word.address).detectorNum % 8; // Later we should define what we divide by somewhere else...
-        unsigned int tel = GetDetector(e_word.address).telNum;
+        int tel = GetDetector(e_word.address).telNum;
 
         tdiff = CalcTimediff(e_word, de_word);
         e_de_time[tel]->Fill(tdiff, ring);
@@ -497,6 +501,7 @@ void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,cons
             // Fill time spectra.
             labr_align_time->Fill(tdiff, i);
             energy_time_labr[i]->Fill(energy, tdiff);
+            energy_time_labr_all->Fill(energy, tdiff);
 
             // Check time gate.
             switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {

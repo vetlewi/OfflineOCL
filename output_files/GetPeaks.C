@@ -2,7 +2,7 @@
 
 void GetPeaks()
 {
-	TFile *file = TFile::Open("beam_Dy.root");
+	TFile *file = TFile::Open("Si_calib.root");
 
 	TH2 *m = (TH2 *)file->Get("de_align_time");
 
@@ -34,9 +34,14 @@ void GetPeaks()
 		fit->Draw("same");
 
 	}
-
+	int n = 1;
 	for (int i = 0 ; i < 64 ; ++i){
-		cout << -peakPos[i] << " ";
+		if ( i / 8 == n ){
+			cout << '\\' << endl;
+			++n;
+		}
+		cout << -peakPos[i] << "\t";
+		
 	}
 
 	cout << endl;
