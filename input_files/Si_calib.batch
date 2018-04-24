@@ -15,7 +15,7 @@ parameter ex_from_ede = \
 17.840488 -1.030053 -0.001005 \
 17.836852 -1.026316 -0.001082
 
-parameter labr_time_cuts = -6.0 6.0 39 51
+parameter labr_time_cuts = -4.0 4.0 40.0 -48.0
 
 
 # Now we will need to read files... There is a lot of the :O
