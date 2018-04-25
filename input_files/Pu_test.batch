@@ -1,0 +1,48 @@
+# Importing the gain shit information.
+Gain file /Users/vetlewi/Documents/coding/OfflineOCL/input_files/Gain_shift_Si.dat
+
+range /Users/vetlewi/Documents/coding/OfflineOCL/input_files/zrange_p.dat
+
+parameter thick_range = 120 160
+
+parameter ex_from_ede = \
+15.740140 -0.951726 -0.001849 \
+15.731670 -0.950539 -0.001884 \
+15.721778 -0.949198 -0.001924 \
+15.710320 -0.947689 -0.001970 \
+15.697120 -0.945994 -0.002021 \
+15.681968 -0.944093 -0.002079 \
+15.666515 -0.942329 -0.002128 \
+15.646684 -0.939945 -0.002202
+
+parameter labr_time_cuts = -4.0 4.0 40.0 48.0
+parameter ppac_time_cuts = -4.0 4.0 40.0 48.0
+
+
+# Now we will need to read files... There is a lot of the :O
+data directory /Users/vetlewi/Desktop/Si_calib
+
+parameter shift_time_de = \
+-109.738	-109.738	-105.613	-109.738	-105.361	-105.864	-100.256	-100.188	\
+-108.044	-104.925	-105.399	-108.723	-108.066	-104.351	-108.035	-108.815	\
+-109.133	-109.238	-105.392	-109.326	-108.657	-109.08		-108.245	-108.517	\
+-103.998	-104.682	-100.417	-104.555	-108.724	-104.358	-108.074	-108.005	\
+-111.79		-98.8777	-104.214	-99.3744	-112.566	-104.363	-104.425	-102.62		\
+-107.183	-107.117	-103.632	-108.457	-112.256	-103.917	-113.166	-105.035	\
+-109.213	-101.865	-108.028	-97.5255	-106.021	-102.764	-102.034	-101.046	\
+-105.931	-108.214	-102.798	-102.329	-105.864	-106.61		-106.51		-101.5
+
+parameter shift_time_labr = \
+0 -0.164945 4.43404 7.94451 7.01586 2.54167 5.27635 -3.0381 4.566 4.83139 9.69094 -8.25652 2.03788 10.3372 7.70452 7.5 \
+1.84399 4.89968 4.5 6.92119 3.01142 3.78616 7.99437 2.89624 3.99118 -0.545375 -0.5 -2.70207 5.77588 10.9154 2.80986 3.5
+
+parameter shift_time_ppac = \
+2.05159e+02 2.27696e+02 2.32875e+02 2.44892e+02
+
+data file sirius-20180418-062652.data
+
+
+export root /Users/vetlewi/Documents/coding/OfflineOCL/output_files/Pu_test.root
+
+# export root spec 3 <name_spec1> <name_spec2> <name_spec3> /path/to/root/file.root
+# export root all /path/to/root/file.root

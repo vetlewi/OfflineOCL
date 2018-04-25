@@ -41,7 +41,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define FISSION 0
+#define FISSION 1
 
 static bool set_par(Parameters& parameters, std::istream& ipar,
                     const std::string& name, int size)
@@ -300,6 +300,17 @@ void UserSort::CreateSpectra()
         }
     }
 
+    for (int i = 0 ; i < NUM_PPAC ; ++i){
+
+        sprintf(tmp, "excitation_time_ppac_%d", i);
+        sprintf(tmp2, "Excitation : ppac time, PPAC %d", i);
+        excitation_time_ppac[i] = Mat(tmp, tmp2, 2000, 0, 10000, "Excitation energy [keV]", 2000, -100, 100, "t_{PPAC} - t_{#Delta E} [ns]");
+
+        sprintf(tmp, "energy_time_ppac_%d", i);
+        sprintf(tmp2, "LaBr energy : ppac time, PPAC %d", i);
+        energy_time_ppac[i] = Mat(tmp, tmp2, 2000, 0, 10000, "LaBr energy [keV]", 2000, -100, 100, "t_{PPAC} - t_{LaBr} [ns]");
+    }
+
     // Time spectra (except those 'listed')
     sprintf(tmp, "de_align_time");
     sprintf(tmp2, "t_{dE} - t_{LaBr nr. 1}");
@@ -308,6 +319,10 @@ void UserSort::CreateSpectra()
     sprintf(tmp, "labr_align_time");
     sprintf(tmp2, "t_{LaBr} - t_{dE ANY}");
     labr_align_time = Mat(tmp, tmp2, 3000, -1500, 1500, "t_{LaBr} - t_{dE ANY} [ns]", NUM_LABR_DETECTORS, 0, NUM_LABR_DETECTORS, "LaBr detector id.");
+
+    sprintf(tmp, "ppac_align_time");
+    sprintf(tmp2, "t_{PPAC} - t_{LaBr nr. 1}");
+    ppac_align_time = Mat(tmp, tmp2, 3000, -1500, 1500, "t_{PPAC} - t_{LaBr nr. 1} [ns]", NUM_PPAC, 0, NUM_PPAC, "PPAC id.");
 
     sprintf(tmp, "energy_time_labr_all");
     sprintf(tmp2, "E_{LaBr} : t_{LaBr} - t_{dE ANY}, all");
@@ -338,6 +353,12 @@ void UserSort::CreateSpectra()
 
     sprintf(tmp, "alfna_bg");
     alfna_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+
+    sprintf(tmp, "alfna_ppac");
+    alfna_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+
+    sprintf(tmp, "alfna_ppac_bg");
+    alfna_ppac_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
     n_fail_e = 0;
     n_fail_de = 0;
@@ -427,6 +448,12 @@ bool UserSort::Sort(const Event &event)
         if ( event.n_labr[0] == 1){
             tdiff = CalcTimediff(event.w_labr[0][0], de_word);
             de_align_time->Fill(tdiff, GetDetector(de_word.address).detectorNum);
+            for (int i = 0 ; i < NUM_PPAC ; ++i){
+                for (int j = 0 ; j < event.n_ppac[i] ; ++j){
+                    tdiff = CalcTimediff(event.w_labr[0][0], event.w_ppac[i][j]);
+                    ppac_align_time->Fill(tdiff, i);
+                }
+            }
         }
 
         // Fill DE - E matrices.
@@ -525,7 +552,17 @@ void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,cons
 void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation, const Event &event)
 {
 
-    // Things should be implemented here...
+
+    // Things with PPAC
+    for (int i = 0 ; i < NUM_PPAC ; ++i){
+        for (int j = 0 ; j < event.n_ppac[i] ; ++j){
+
+            double tdiff = CalcTimediff(de_word, event.w_ppac[i][j]);
+            excitation_time_ppac[i]->Fill(excitation, tdiff);
+        }
+    }
+
+    // Things with gamma
     for (int i = 0 ; i < NUM_LABR_DETECTORS ; ++i){
         for (int j = 0 ; j < event.n_labr[i] ; ++j){
 
@@ -536,21 +573,58 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
 
             // Fill time spectra.
             labr_align_time->Fill(tdiff, i);
+            energy_time_labr[i]->Fill(energy, tdiff);
+            energy_time_labr_all->Fill(energy, tdiff);
+
+            bool ppac_prompt =  false;
+
+            for (int n = 0 ; n < NUM_PPAC ; ++n){
+                for (int m = 0 ; m < event.n_ppac[m] ; ++m){
+
+                    double tdiff_ppac = CalcTimediff(event.w_labr[i][j], event.w_ppac[n][m]);
+                    energy_time_ppac[i]->Fill(energy, tdiff_ppac);
+
+                    switch ( CheckTimeStatus(tdiff_ppac, ppac_time_cuts) ) {
+                        case is_prompt : {
+                            ppac_prompt = true;
+                            break;
+                        }
+                        case is_background : {
+                            ppac_prompt = false;
+                            break;
+                        }
+                        case ignore : {
+                            break;
+                        }
+                    }
+                }
+            }
 
             // Check time gate.
             switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {
                 case is_prompt : {
                     alfna->Fill(energy, excitation);
+                    if (ppac_prompt)
+                        alfna_ppac->Fill(energy, excitation);
                     break;
                 }
                 case is_background : {
+                    alfna->Fill(energy, excitation, -1);
                     alfna_bg->Fill(energy, excitation);
+                    if (ppac_prompt){
+                        alfna_ppac->Fill(energy, excitation, -1);
+                        alfna_ppac_bg->Fill(energy, excitation);
+                    }
                     break;
                 }
                 case ignore : {
                     break;
                 }
             }
+        }
+    }
+
+
 
 
             /*for (int k = 0 ; k < NUM_PPAC ; ++k){
@@ -598,8 +672,6 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
                     }
                 }
             }*/
-        }
-    }
 }
 
 

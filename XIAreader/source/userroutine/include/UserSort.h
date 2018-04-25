@@ -81,9 +81,12 @@ private:
 
     // Time spectra.
     Histogram2Dp e_de_time[NUM_SI_E_DET]; // This will be a time : dE ring spectrum.
-    Histogram2Dp de_align_time;  // LaBr 0 as stop and dE as start. For aligning the dE detectors. Axis is x: time, y: dE detector nr.
+    Histogram2Dp de_align_time;  // LaBr 0 as start? and dE as start. For aligning the dE detectors. Axis is x: time, y: dE detector nr.
     Histogram2Dp labr_align_time;  // LaBr as stop and dE as start. For aligning the LaBr detectors. Axis is x: time, y: LaBr detector nr.
+    Histogram2Dp ppac_align_time;   // LaBr 0 as start and PPAC as stop. For aligning the PPACs.
     Histogram2Dp energy_time_labr[NUM_LABR_DETECTORS];
+    Histogram2Dp excitation_time_ppac[NUM_PPAC];
+    Histogram2Dp energy_time_ppac[NUM_PPAC];
     Histogram2Dp energy_time_labr_all;  // Energy vs. time in labr for all labr detectors.
 
 
@@ -99,6 +102,7 @@ private:
 
     // Particle - gamma-ray coincidence matrix
     Histogram2Dp alfna, alfna_bg;
+    Histogram2Dp alfna_ppac, alfna_ppac_bg;
 
     // Gain labr
     Parameter gain_labr;
