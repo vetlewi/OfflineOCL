@@ -71,3 +71,45 @@ Relace the zeros following "parameter shift_time_labr = \" in the batch file wit
 
 10) Re-run the sorting program and enjoy all your perfectly align time spectra!!
 
+
+## The Validate.cpp program
+This is a small tool to check if the data aquisition was 'resynchronized' without the file being changed. Unfortunatly a 'resynchronized' will cause the time offsets of detectors to change. Luckily this effect is fairly small and are easily calibrated, but requires new alignment parameters each time there is such a 'resynchronization'. Since run files could potentially contain several occurences of such a 'resynchronization' we will need to split the file whenever this happends. The Validate.cpp is a short C++ program that checks run files if there are any such events. 
+
+### How to compile
+The program is compiled by running following:
+```
+>>g++ -O3 -o Validate Validate.cpp
+```
+
+### How to run
+The program is ran by:
+```
+>>./Validate <run file #1> <run file #2> etc.
+```
+This will either check if the files needs to be split or not.
+
+### How to make it 'split' files.
+Change
+``` C
+#define SPLITFILES 0
+```
+to
+``` C
+#define SPLITFILES 1
+```
+in the Validate.cpp and recompile (see above).
+
+
+### How to understand the output
+
+The output will look something like this:
+```
+Results of file 'sirius-20180420-143428.data':
+Total number of events: 4673451
+Total number of ordered words: 4673451
+Total number of unordered words: 0
+--------------------------------------------------
+```
+and tells you that you need to split the file if "Total number of unordered words" is different from zero.
+
+
