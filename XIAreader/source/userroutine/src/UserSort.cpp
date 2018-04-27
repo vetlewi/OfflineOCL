@@ -41,7 +41,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define FISSION 1
+#define FISSION 0
 
 static bool set_par(Parameters& parameters, std::istream& ipar,
                     const std::string& name, int size)
@@ -243,6 +243,9 @@ void UserSort::CreateSpectra()
 
         sprintf(tmp, "energy_time_labr_%02d", i+1);
         energy_time_labr[i] = Mat(tmp, tmp, 1000, 0, 16000, "LaBr energy [keV]", 2000, -100, 100, "Time difference [ns]");
+
+        sprintf(tmp, "energy_time_labr_aboveSn_%02d", i+1);
+        energy_time_labr_above[i] = Mat(tmp, tmp, 1000, 0, 16000, "LaBr energy [keV]", 2000, -100, 100, "Time difference [ns]");
     }
 
     // Allocating the dE 'singles' spectra
@@ -529,6 +532,10 @@ void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,cons
             labr_align_time->Fill(tdiff, i);
             energy_time_labr[i]->Fill(energy, tdiff);
             energy_time_labr_all->Fill(energy, tdiff);
+
+            if ( excitation > 8473.60 )
+                energy_time_labr_above[i]->Fill(energy, tdiff);
+
 
             // Check time gate.
             switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {
