@@ -148,7 +148,7 @@ parameter shift_time_labr = \
 0 4.5 6.51551 -9.88696 4.43331 -2.58014 9.21493 -9.0 0.5 4.04821 3.27627 -3.97553 -7.24572 2.99742 3.41019 3.5 \
 2.45209 -3.03186 -3.5 -2.7107 -5.98139 -4.97187 -6.01088 -3.9932 -0.730579 8.44057 9.5 42.1855 -2.49788 3.33744 -0.545229 -0.5
 
-#data file sirius-20180416-142401-big-000_A.data
+data file sirius-20180416-142401-big-000_A.data
 
 # ------------------------------------------------ #
 
@@ -166,7 +166,7 @@ parameter shift_time_labr = \
 0 3.5 6.74969 0.0309561 3.02238 6.1891 8.09878 -10.4115 -0.446031 4.78375 3.59813 -3.57323 -5.62646 2.5 4.5 3.5 \
 3.73542 6.93373 7.5 -2.80394 4.98276 -4.50195 -6.01434 -3.47826 -0.00952861 8.84245 9.5 -3.03691 7.52817 3.00685 -1.16269 -0.5
 
-#data file sirius-20180416-142401-big-000_B.data
+data file sirius-20180416-142401-big-000_B.data
 
 # ------------------------------------------------ #
 
@@ -191,14 +191,13 @@ parameter gain_e = 1.6007 1.58617 1.5912 1.58142 1.6265 1.59817 1.5919 1.6587
 parameter shift_e = 1050.0 1287.371 1242.1514 1207.3135 961.7605 1198.4624 932.92811 1024.183459622
 
 data file sirius-20180416-145040.data
-#data file sirius-20180416-145040-big-000.data
-#data file sirius-20180416-145040-big-001.data
-#data file sirius-20180416-145040-big-002.data
-#data file sirius-20180416-145040-big-003.data
+data file sirius-20180416-145040-big-000.data
+data file sirius-20180416-145040-big-001.data
+data file sirius-20180416-145040-big-002.data
+data file sirius-20180416-145040-big-003.data
 
-# ------------------------------------------------ #
 
-export root /Users/vetlewi/Documents/coding/OfflineOCL/output_files/Si_calib_s1.root
+export root /Users/vetlewi/Documents/coding/OfflineOCL/output_files/Si_calib.root
 
 # export root spec 3 <name_spec1> <name_spec2> <name_spec3> /path/to/root/file.root
 # export root all /path/to/root/file.root

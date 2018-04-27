@@ -55,9 +55,6 @@ private:
     prompt_status_t CheckTimeStatus(const double &time,         /*!< Time of the hit        */
                                     const Parameter &paramter   /*!< Gates of the detector  */) const;
 
-    // Method to give names to some paramters
-    void NameTimeParameters();
-
     // Method for calibrating energy of a detector.
     double CalibrateE(const word_t &w) const;
 

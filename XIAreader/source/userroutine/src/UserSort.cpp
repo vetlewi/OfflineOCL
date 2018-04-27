@@ -630,55 +630,6 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
             }
         }
     }
-
-
-
-
-            /*for (int k = 0 ; k < NUM_PPAC ; ++k){
-                for (int l = 0 ; l < event.n_ppac[k] ; ++l){
-                    word_t ppac_word = event.w_ppac[k][l];
-
-                    double tdiff_ppac_labr = CalcTimediff(ppac_word, event.w_labr[i][j]);
-                    time_ppac_labr[k]->Fill(tdiff_ppac_labr, i);
-                    time_energy_ppac_labr[k]->Fill(tdiff_ppac_labr, energy);
-
-                    // Test: Try to detect whether there is a timewalk or synchornization error
-                    // NOT WORKING YET
-                    // Currently, it takes the "walltime" from the listtime timestamp. The time stamps there
-                    // are currently reset every time one clicks "start" (/stop) in the aquisition software.
-                    // Thus, during the 240Pu experiment, we had several times a resynchronization, which means
-                    // in turn a potential misalignment for the next file
-                    // We'll work on some method to correct for this.
-                    if(i==0)
-                        time_walltime_ppac_labr_01->Fill(tdiff_ppac_labr,ppac_word.timestamp);
-                    if(i==5)
-                        time_walltime_ppac_labr_06->Fill(tdiff_ppac_labr,ppac_word.timestamp);
-
-
-
-                    if (tdiff_ppac_labr > ppac_time_cut.lower_prompt && tdiff_ppac_labr < ppac_time_cut.higher_prompt){
-                        if(i==0)
-                            time_energy_ppac_labr_00->Fill(tdiff_ppac_labr, energy);
-                        if(i==8)
-                            time_energy_ppac_labr_08->Fill(tdiff_ppac_labr, energy);
-                    }
-
-
-                    double tdiff_ppac_de = CalcTimediff(ppac_word, de_word);
-                    time_ppac_de[k]->Fill(tdiff_ppac_de, GetDetector(de_word.address).detectorNum);
-                    time_energy_ppac_de[k]->Fill(tdiff_ppac_de, CalibrateE(de_word));
-
-                    // Gate on the prompt fission gamma rays
-                    // Important: Not yet propperly bg subtracted
-                    if (tdiff_ppac_labr > ppac_time_cut.lower_prompt && tdiff_ppac_labr < ppac_time_cut.higher_prompt){
-                        alfna_ppac->Fill(energy, excitation);
-                    }
-                    else if (tdiff_ppac_labr > ppac_time_cut.lower_bg && tdiff_ppac_labr < ppac_time_cut.higher_bg){
-                        alfna_ppac->Fill(energy, excitation, -1);
-                        alfna_bg_ppac->Fill(energy, excitation, 1);
-                    }
-                }
-            }*/
 }
 
 
