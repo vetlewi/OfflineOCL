@@ -86,9 +86,9 @@ The program is ran by:
 ```
 >>./Validate <run file #1> <run file #2> etc.
 ```
-This will either check if the files needs to be split or not.
+This will either check if the files needs to be split and split the file if needed (see below). If configured to split files then the resulting files will be written with a suffix 'A', 'B', 'C', etc. to the original filename.
 
-### How to make it 'split' files.
+### How to make it actually 'split' the files.
 Change
 ``` C
 #define SPLITFILES 0
