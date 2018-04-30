@@ -100,6 +100,7 @@ private:
     // Particle - gamma-ray coincidence matrix
     Histogram2Dp alfna, alfna_bg;
     Histogram2Dp alfna_ppac, alfna_ppac_bg;
+    Histogram2Dp alfna_veto_ppac, alfna_veto_ppac_bg;
 
     // Gain labr
     Parameter gain_labr;

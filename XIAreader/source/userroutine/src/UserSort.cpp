@@ -363,6 +363,13 @@ void UserSort::CreateSpectra()
     sprintf(tmp, "alfna_ppac_bg");
     alfna_ppac_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
+    sprintf(tmp, "alfna_veto_ppac");
+    alfna_veto_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+
+    sprintf(tmp, "alfna_veto_ppac_bg");
+    alfna_veto_ppac_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+
+
     n_fail_e = 0;
     n_fail_de = 0;
     n_tot_e = 0;
@@ -613,6 +620,8 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
                     alfna->Fill(energy, excitation);
                     if (ppac_prompt)
                         alfna_ppac->Fill(energy, excitation);
+                    else
+                        alfna_veto_ppac->Fill(energy, excitation);
                     break;
                 }
                 case is_background : {
@@ -621,6 +630,9 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
                     if (ppac_prompt){
                         alfna_ppac->Fill(energy, excitation, -1);
                         alfna_ppac_bg->Fill(energy, excitation);
+                    } else {
+                        alfna_veto_ppac->Fill(energy, excitation, -1);
+                        alfna_veto_ppac_bg->Fill(energy, excitation);
                     }
                     break;
                 }
