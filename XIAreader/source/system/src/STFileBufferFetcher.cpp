@@ -30,7 +30,7 @@
 
 const WordBuffer* STFileBufferFetcher::Next(Status& state)
 {
-    int i = reader.Read( &buffer );
+    int i = reader.Read( buffer.GetBuffer(), buffer.GetSize() );
 	if ( i > 0 )
 		state = OKAY;
 	else if ( i == 0 )

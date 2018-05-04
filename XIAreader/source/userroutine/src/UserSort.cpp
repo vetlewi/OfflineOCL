@@ -22,7 +22,7 @@
 
 #include "DefineFile.h"
 
-#include "TDRWordBuffer.h"
+#include "WordBuffer.h"
 #include "Histogram1D.h"
 #include "Histogram2D.h"
 #include "Histograms.h"

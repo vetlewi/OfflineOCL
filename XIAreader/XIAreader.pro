@@ -52,7 +52,6 @@ HEADERS += source/DefineFile.h \
         source/core/include/UserRoutine.h \
         source/core/include/Unpacker.h \
         source/system/include/RateMeter.h \
-        source/system/include/TDRWordBuffer.h \
         source/system/include/FileReader.h \
         source/system/include/aptr.h \
         source/system/include/IOPrintf.h \
@@ -70,4 +69,5 @@ HEADERS += source/DefineFile.h \
         source/userroutine/include/UserSort.h \
         source/system/include/PixieSettings.h \
         source/system/include/BufferType.h \
-        experimentsetup.h
+        experimentsetup.h \
+    source/system/include/WordBuffer.h

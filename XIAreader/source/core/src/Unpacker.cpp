@@ -29,7 +29,7 @@
 
 #include "Unpacker.h"
 
-#include "TDRWordBuffer.h"
+#include "WordBuffer.h"
 #include "Event.h"
 #include "experimentsetup.h"
 #include "DefineFile.h"

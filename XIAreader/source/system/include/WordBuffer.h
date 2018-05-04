@@ -23,6 +23,8 @@
 
 #include <memory>
 
+#include "BufferType.h"
+
 //! Structure type to contain individual decoded TDR words.
 //! \author Vetle W. Ingeberg
 //! \date 2015-2016
@@ -37,6 +39,15 @@ typedef struct {
     double cfdcorr;         //!< Correction from the CFD.
 } word_t;
 
+class WordBuffer : public Buffer<word_t> {
+    enum { BUFSIZE = 1024 };
+public:
+    WordBuffer() : Buffer<word_t>(BUFSIZE, new word_t[BUFSIZE]) { }
+    WordBuffer(int sz, word_t *buf ) : Buffer<word_t>(sz, buf) { }
+    ~WordBuffer() { delete[] GetBuffer(); }
+    WordBuffer *New() { return new WordBuffer(); }
+};
+
 
 /*!
  * \class WordBuffer
@@ -46,17 +57,18 @@ typedef struct {
  * \date 2015-2016
  * \copyright GNU Public License v. 3
  */
+#ifdef NEW
 class WordBuffer {
 protected:
 //! Initilizer
-	WordBuffer(int sz,		/*!< The size of the word buffer.	*/
+    WordBuffer(int sz,		/*!< The size of the word buffer.	*/
 			   word_t *buf	/*!< The buffer data.				*/)
 		: size( sz )
 		, buffer( buf )
 		, is_set( true ) { }
 public:
 	//! Virtual no-op destructor.
-	virtual ~WordBuffer() { }
+    virtual ~WordBuffer() { }
 
 	//! Get data from the buffer.
 	/*! \return the dataword from the buffer.
@@ -88,7 +100,7 @@ public:
         }
 
 	//! Create a new buffer of the same type.
-	virtual WordBuffer* New() { return 0; }
+    virtual WordBuffer* New() { return 0; }
 
 	void Resize(unsigned int new_size)
 	{
@@ -122,10 +134,10 @@ private:
 class TDRWordBuffer : public WordBuffer {
     enum { BUFSIZE = 256 /*!< The size of a buffer in words. */ };
 public:
-	TDRWordBuffer() : WordBuffer(BUFSIZE, new word_t[BUFSIZE]) { }
-	TDRWordBuffer(int sz, word_t *buf ) : WordBuffer(sz, buf) { }
+    TDRWordBuffer() : WordBuffer(BUFSIZE, new word_t[BUFSIZE]) { }
+    TDRWordBuffer(int sz, word_t *buf ) : WordBuffer(sz, buf) { }
 	~TDRWordBuffer() { delete GetBuffer(); }
-	WordBuffer* New() { return new TDRWordBuffer(); }
+    WordBuffer* New() { return new TDRWordBuffer(); }
 };
-
+#endif // NEW
 #endif // TDRWORDBUFFER_H

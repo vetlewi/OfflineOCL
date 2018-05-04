@@ -25,7 +25,7 @@
 
 #include "DefineFile.h"
 
-class Buffer;
+//class Buffer;
 class WordBuffer;
 struct Event;
 

@@ -26,7 +26,7 @@
 #include <cstdint>
 
 #include "experimentsetup.h"
-#include "TDRWordBuffer.h"
+#include "WordBuffer.h"
 #include "XIA_CFD.h"
 
 //! Structure type to contain individual decoded events.

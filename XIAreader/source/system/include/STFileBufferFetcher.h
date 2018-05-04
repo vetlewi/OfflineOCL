@@ -23,7 +23,7 @@
 
 #include "FileBufferFetcher.h"
 #include "FileReader.h"
-#include "TDRWordBuffer.h"
+#include "WordBuffer.h"
 
 #include <string>
 
@@ -46,7 +46,7 @@ public:
 	//! Calls the reader to open a file.
     Status Open(const std::string& filename,    /*!< File to read.          */
                 int bufnum=0                    /*!< First buffer to read.  */)
-		{return reader.Open(filename, bufnum*buffer.GetSize()) ? OKAY : ERROR; }
+        {return reader.Open(filename.c_str(), bufnum*buffer.GetSize()) ? OKAY : ERROR; }
 
 	//! Calls the reader to fetch a buffer.
     /*! \return Pointer to the buffer that have been read.
@@ -58,7 +58,7 @@ private:
 	FileReader reader;
 
 	//! The buffer used to store the file data in.
-	TDRWordBuffer buffer;
+    WordBuffer buffer;
 };
 
 #endif // STFILEBUFFERFETCHER_H

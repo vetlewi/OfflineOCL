@@ -35,7 +35,7 @@
 #include "STFileBufferFetcher.h"
 #include "MTFileBufferFetcher.h"
 
-#include "TDRWordBuffer.h"
+#include "WordBuffer.h"
 #include "Event.h"
 
 #include "Unpacker.h"
