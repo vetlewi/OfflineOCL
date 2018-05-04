@@ -25,6 +25,7 @@
 #include <cstdio>
 
 #include "WordBuffer.h"
+#include "DefineFile.h"
 
 
 /*!
@@ -77,6 +78,7 @@ private:
 	//! Number of buffers that have been read.
 	bool errorflag;
 
+    //! Method for reading and parsing an event from the file.
     bool ReadEvent(word_t &hit);
 };
 

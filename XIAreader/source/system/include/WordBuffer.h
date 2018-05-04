@@ -40,7 +40,8 @@ typedef struct {
 } word_t;
 
 class WordBuffer : public Buffer<word_t> {
-    enum { BUFSIZE = 1024 };
+    //enum { BUFSIZE = 1024 };
+    enum { BUFSIZE = 4096 };
 public:
     WordBuffer() : Buffer<word_t>(BUFSIZE, new word_t[BUFSIZE]) { }
     WordBuffer(int sz, word_t *buf ) : Buffer<word_t>(sz, buf) { }

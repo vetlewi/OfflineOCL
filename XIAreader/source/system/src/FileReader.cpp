@@ -8,10 +8,7 @@
 
 #include "WordBuffer.h"
 
-#define BUFFER_SIZE 1024
-//#define BUFFER_SIZE 2048
-
-inline int xiaseek(std::FILE* stream, int offset)
+inline int seek(std::FILE* stream, int offset)
 {
     long moved = 0, length = 0;
     uint32_t head;
@@ -45,8 +42,10 @@ bool FileReader::Open(const char *filename, int want)
 {
 	Close();
     file_stdio = std::fopen(filename, "rb");
+
     errorflag = ( file_stdio==nullptr )
-                || ( xiaseek(file_stdio, want) != 0);
+                || ( seek(file_stdio, want) != 0);
+
     return !errorflag;
 }
 
