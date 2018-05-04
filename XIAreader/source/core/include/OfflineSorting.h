@@ -167,21 +167,6 @@ private:
      */
     bool next_commandline(std::istream& in, std::string& cmd_line);
 
-#ifdef MTSORTING
-    //! Function for a sparate sorting loop. Will read from a blocking FIFO.
-    void SorterThread();
-
-    //! FIFO for the sorter thread.
-    //moodycamel::BlockingReaderWriterQueue<Event, 16384> fifo;
-    FIFO_events fifo;
-
-    //! Atomic (thread safe) bool so that we can tell the sorter thread that we are done reading the file and it should terminated.
-    //! This doesn't need to be thread safe since the file_done is only written by the main thread.
-    bool file_done;
-
-    //! This should in theory be safe, since we will only modify this variable inside the SorterThread, while reading it outside.
-    bool sort_thread_running;
-#endif // MTSORTING
 
 };
 

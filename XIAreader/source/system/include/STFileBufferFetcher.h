@@ -44,8 +44,8 @@ class STFileBufferFetcher : public FileBufferFetcher {
 public:
 
 	//! Calls the reader to open a file.
-    Status Open(const std::string& filename,    /*!< File to read.          */
-                int bufnum=0                    /*!< First buffer to read.  */)
+    Status Open(const std::string& filename,    /*!< File to read.                  */
+                int bufnum=0                    /*!< First buffer no. to read from. */)
         {return reader.Open(filename.c_str(), bufnum*buffer.GetSize()) ? OKAY : ERROR; }
 
 	//! Calls the reader to fetch a buffer.

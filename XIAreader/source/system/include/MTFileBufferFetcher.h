@@ -55,8 +55,8 @@ public:
     //! Open a new file.
     /*! \return the result of the opening of the file.
      */
-    Status Open(const std::string& filename,    /*!< Filename of the file to read.          */
-                int bufnum = 0                  /*!< What buffer no. to start reading from. */);
+    Status Open(const std::string& filename,    /*!< File to read.                  */
+                int bufnum = 0                  /*!< First buffer no. to read from. */);
 
 	/*! Creates a new thread which prefetches some buffers while
 	 * the main thread is sorting.
