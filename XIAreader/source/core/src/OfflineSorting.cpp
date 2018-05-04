@@ -208,8 +208,8 @@ bool OfflineSorting::SortFile(const std::string filename, int buf_start, int buf
     std::cout << '\r' << buffer_count << '/' << bad_buffer_count
               << ' ' << unpacker->GetAverageLength() << " hits/event"
               << ' ' << double(nEvents)/buffer_count << " event/bufs"
-              << ' ' << rateMeter.TotalRate()*1024
-              << " bufs/s " << std::endl;
+              << ' ' << rateMeter.TotalRate()*WordBuffer::BUFSIZE
+              << " hits/s " << std::endl;
     return true;
 
 }
