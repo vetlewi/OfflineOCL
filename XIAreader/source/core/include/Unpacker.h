@@ -76,8 +76,6 @@ private:
 	 					int& n_data		/*!< The amount of words extracted in current event.	*/);
 
 
-    bool PackEvent(Event &event, int start, int stop);
-
 	//! The buffer to read from.
 	const WordBuffer* buffer;
 
