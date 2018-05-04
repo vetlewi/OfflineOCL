@@ -167,7 +167,8 @@ bool Unpacker::UnpackOneEvent(Event& event, int& n_data)
 
             curr_Buf = i+1;
             n_data = stop-start;
-            return PackEvent(event, start, stop);
+            event.PackEvent(buffer, start, stop);
+            return true;
         }
     }
 
@@ -187,7 +188,7 @@ bool Unpacker::PackEvent(Event& event, int start, int stop)
         case labr: {
             if ( event.n_labr[dinfo.detectorNum] < MAX_WORDS_PER_DET &&
                  dinfo.detectorNum < NUM_LABR_DETECTORS){
-                event.w_labr[dinfo.detectorNum][event.n_labr[dinfo.detectorNum]++] = subevent_t((*buffer)[i]);
+                event.w_labr[dinfo.detectorNum][event.n_labr[dinfo.detectorNum]++] = (*buffer)[i];
                 ++event.tot_labr;
             } else {
                 std::cerr << __PRETTY_FUNCTION__ << ": Could not populate LaBr word, run debugger with appropriate break point for more details" << std::endl;
@@ -197,7 +198,7 @@ bool Unpacker::PackEvent(Event& event, int start, int stop)
         case deDet: {
             if ( event.n_dEdet[dinfo.detectorNum] < MAX_WORDS_PER_DET &&
                  dinfo.detectorNum < NUM_SI_DE_DET){
-                event.w_dEdet[dinfo.detectorNum][event.n_dEdet[dinfo.detectorNum]++] = subevent_t((*buffer)[i]);
+                event.w_dEdet[dinfo.detectorNum][event.n_dEdet[dinfo.detectorNum]++] = (*buffer)[i];
                 ++event.tot_dEdet;
             } else {
                 std::cerr << __PRETTY_FUNCTION__ << ": Could not populate dEdet word, run debugger with appropriate break point for more details" << std::endl;
@@ -207,7 +208,7 @@ bool Unpacker::PackEvent(Event& event, int start, int stop)
         case eDet: {
             if ( event.n_Edet[dinfo.detectorNum] < MAX_WORDS_PER_DET &&
                  dinfo.detectorNum < NUM_SI_E_DET){
-                event.w_Edet[dinfo.detectorNum][event.n_Edet[dinfo.detectorNum]++] = subevent_t((*buffer)[i]);
+                event.w_Edet[dinfo.detectorNum][event.n_Edet[dinfo.detectorNum]++] = (*buffer)[i];
                 ++event.tot_Edet;
             } else {
                 std::cerr << __PRETTY_FUNCTION__ << ": Could not populate Edet word, run debugger with appropriate break point for more details" << std::endl;
@@ -217,7 +218,7 @@ bool Unpacker::PackEvent(Event& event, int start, int stop)
         case eGuard: {
             if ( event.n_Eguard[dinfo.detectorNum] < MAX_WORDS_PER_DET &&
                  dinfo.detectorNum < NUM_SI_E_GUARD){
-                event.w_Eguard[dinfo.detectorNum][event.n_Eguard[dinfo.detectorNum]++] = subevent_t((*buffer)[i]);
+                event.w_Eguard[dinfo.detectorNum][event.n_Eguard[dinfo.detectorNum]++] = (*buffer)[i];
                 ++event.tot_Eguard;
             } else {
                 std::cerr << __PRETTY_FUNCTION__ << ": Could not populate eGuard word, run debugger with appropriate break point for more details" << std::endl;
@@ -227,7 +228,7 @@ bool Unpacker::PackEvent(Event& event, int start, int stop)
         case ppac: {
             if ( event.n_ppac[dinfo.detectorNum] < MAX_WORDS_PER_DET &&
                  dinfo.detectorNum < NUM_PPAC){
-                event.w_ppac[dinfo.detectorNum][event.n_ppac[dinfo.detectorNum]++] = subevent_t((*buffer)[i]);
+                event.w_ppac[dinfo.detectorNum][event.n_ppac[dinfo.detectorNum]++] = (*buffer)[i];
                 ++event.tot_ppac;
             } else {
                 std::cerr << __PRETTY_FUNCTION__ << ": Could not populate PPAC word, run debugger with appropriate break point for more details" << std::endl;
@@ -236,7 +237,7 @@ bool Unpacker::PackEvent(Event& event, int start, int stop)
         }
         case rfchan: {
             if ( event.n_RFpulse < MAX_WORDS_PER_DET )
-                event.w_RFpulse[event.n_RFpulse++] = subevent_t((*buffer)[i]);
+                event.w_RFpulse[event.n_RFpulse++] = (*buffer)[i];
             else
                 std::cerr << __PRETTY_FUNCTION__ << ": Could not populate RF word, run debugger with appropriate break point for more details" << std::endl;
             break;

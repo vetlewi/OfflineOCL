@@ -29,12 +29,7 @@
 #include "WordBuffer.h"
 #include "XIA_CFD.h"
 
-//! Structure type to contain individual decoded events.
-//! \author Vetle W. Ingeberg
-//! \date 2015-2018
-//! \copyright GNU Public License v. 3
-
-typedef word_t subevent_t;
+class WordBuffer;
 
 
 //! Object to contain built events.
@@ -43,39 +38,42 @@ typedef word_t subevent_t;
 //! \copyright GNU Public License v. 3
 struct Event {
 
-    subevent_t w_labr[NUM_LABR_DETECTORS][MAX_WORDS_PER_DET];   //!< Array to contain LaBr words
+    word_t w_labr[NUM_LABR_DETECTORS][MAX_WORDS_PER_DET];   //!< Array to contain LaBr words
     int n_labr[NUM_LABR_DETECTORS];                         //!< Number of LaBr words populated
     int tot_labr;                                           //!< Total number of LaBr words in the event
 
-    subevent_t w_dEdet[NUM_SI_DE_DET][MAX_WORDS_PER_DET];       //!< Array to contain Si words from the dE rings
+    word_t w_dEdet[NUM_SI_DE_DET][MAX_WORDS_PER_DET];       //!< Array to contain Si words from the dE rings
     int n_dEdet[NUM_SI_DE_DET];                            //!< Number of Si words populated from the dE rings
     int tot_dEdet;                                          //!< Total number of Si words from the dE rings
 
-    subevent_t w_Edet[NUM_SI_E_DET][MAX_WORDS_PER_DET];         //!< Array to contain Si words from the dE sectors
+    word_t w_Edet[NUM_SI_E_DET][MAX_WORDS_PER_DET];         //!< Array to contain Si words from the dE sectors
     int n_Edet[NUM_SI_E_DET];                               //!< Number of Si words populated from the dE sectors
     int tot_Edet;                                           //!< Total number of Si words from the dE sectors
 
-    subevent_t w_Eguard[NUM_SI_E_GUARD][MAX_WORDS_PER_DET];    //!< Array to contain Si words from the E sectors
+    word_t w_Eguard[NUM_SI_E_GUARD][MAX_WORDS_PER_DET];    //!< Array to contain Si words from the E sectors
     int n_Eguard[NUM_SI_E_GUARD];                          //!< Number of Si words populated from the E sectors
     int tot_Eguard;                                         //!< Total number of Si words from the dE sectors
 
-    subevent_t w_ppac[NUM_PPAC][MAX_WORDS_PER_DET];         //!< Array to contain PPAC words from the PPACs
+    word_t w_ppac[NUM_PPAC][MAX_WORDS_PER_DET];         //!< Array to contain PPAC words from the PPACs
     int n_ppac[NUM_PPAC];                                   //!< Number of PPAC words for each PPAC in the event
     int tot_ppac;
 
-    subevent_t w_RFpulse[MAX_WORDS_PER_DET];                    //!< Array to contain RF pulse words
+    word_t w_RFpulse[MAX_WORDS_PER_DET];                    //!< Array to contain RF pulse words
     int n_RFpulse;                                          //!< Number of RF pulses populated
 
     int length;  //! Total length of the event (in no. of words)
 
 
-    subevent_t trigger;     //! This is the word that "triggers" the event.
+    word_t trigger;     //! This is the word that "triggers" the event.
 
       //! Constructor
     Event() { Reset(); }
 
     //! Destructor
     ~Event(){ Reset(); }
+
+    //! Pack the event with data.
+    void PackEvent(const WordBuffer *buffer, int start, int stop);
 
     //! Set all counters to zero
     void Reset()
