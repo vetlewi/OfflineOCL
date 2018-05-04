@@ -39,7 +39,6 @@
 #include "Event.h"
 
 #include "Unpacker.h"
-//#include "TDRUnpacker.h"
 
 #include "RootWriter.h"
 #include "MamaWriter.h"
@@ -49,9 +48,6 @@
 #include <sstream>
 #include <signal.h>
 #include <unistd.h>
-
-#include <thread>
-
 
 
 //! Global variable signaling if the sorting has been interrupted.
@@ -147,55 +143,11 @@ bool OfflineSorting::SortBuffer(const WordBuffer* buffer) // This will run in th
         ustat = unpacker->Next(event);
         if ( ustat != Unpacker::OKAY )
             break;
-#ifndef MTSORTING
         userSort.Sort(event);
-#else
-        // If sort_thread is not running
-        // If sort_thread is not running. Return false... We have a problem.
-        if ( !sort_thread_running )
-            return false;
-        //while ( !fifo.try_enqueue(event) ){
-            //std::this_thread::sleep_for(std::chrono::microseconds(5)); // Let the sorter do its thing for a while, then add data.
-        //}
-        fifo.Push(event);
-#endif // MTSORTING
         nEvents += 1;
     }
     return ustat == Unpacker::END;
-
-    // Wait for thread to finish.
 }
-
-// ########################################################################
-
-#ifdef MTSORTING
-void OfflineSorting::SorterThread(){ // This will run in a spearate thread. It should end once the file is finished.
-
-    Event event;
-    sort_thread_running = true;
-    while ( !file_done ){
-
-        // Check if we need a new buffer
-        //fifo.try_dequeue(event);
-        //userSort.Sort(event);
-        //if ( fifo.wait_dequeue_timed(event, 1000) )
-        //    userSort.Sort(event);
-        event = fifo.Pop();
-        userSort.Sort(event);
-
-    } // We will exit this loop if and only if all events have been unpacked to the fifo!
-
-    // At this point, the main thread should be waiting for this thread to finish.
-    // All events that can be added has been added to the queue.
-    /*bool have_events = fifo.try_dequeue(event); // Returns true if we have an event.
-    while ( have_events ){
-        userSort.Sort(event);
-        have_events = fifo.try_dequeue(event);
-    }*/
-    sort_thread_running = false;
-    return;
-}
-#endif // MTSORTING
 
 // ########################################################################
 
@@ -216,12 +168,6 @@ bool OfflineSorting::SortFile(const std::string filename, int buf_start, int buf
     float bufs_per_sec;
     nEvents = 0;
 
-    // If we run with MT, start the thread.
-#ifdef MTSORTING
-    file_done = false;
-    std::thread sort_thread(&OfflineSorting::SorterThread, this);
-#endif // MTSORTING
-
     // Loop over all buffers
     for (int b = buf_start ; buf_end < 0 || b < buf_end ; ++b){
         // Stop if Ctrl-C has been passed
@@ -234,13 +180,6 @@ bool OfflineSorting::SortFile(const std::string filename, int buf_start, int buf
             break;
         } else if ( fstate == BufferFetcher::ERROR) {
             std::cerr << "\ndata: error reading buffer " << b << " in file '" << filename << "'" << std::endl;
-#ifdef MTSORTING
-            // Make sure the sort_thread is killed.
-            file_done = true;
-            // Check if the thread is running (joinable)
-            if ( sort_thread.joinable() )
-                sort_thread.join(); // Wait for the sort thread to finish.
-#endif // MTSORTING
             return false;
         }
 
@@ -264,13 +203,6 @@ bool OfflineSorting::SortFile(const std::string filename, int buf_start, int buf
             }
         }
     }
-
-#ifdef MTSORTING
-    // Make sure the sorting thread is terminated.
-    file_done = true;
-    if ( sort_thread.joinable() )
-        sort_thread.join(); // Wait for the sort thread.
-#endif // MTSORTING
 
     // Print counter and rate at the end
     std::cout << '\r' << buffer_count << '/' << bad_buffer_count
@@ -421,15 +353,7 @@ bool OfflineSorting::next_command(const std::string& cmd)
     } else if ( name == "reset_histograms"){
         userSort.GetHistograms().ResetAll();
         return true;
-    }/* else if ( name == "delay") {
-        std::string tmp, filename;
-        icmd >> tmp;
-        if (tmp == "file"){
-            icmd >> filename;
-            bufferFetcher->SetDelay(filename);
-            return true;
-        } else { return false; }
-    }*/ else {
+    } else {
         return userSort.Command(cmd);
     }
 }
