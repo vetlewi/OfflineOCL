@@ -109,9 +109,11 @@ bool FileReader::ReadEvent(word_t &hit)
     if ( fread(&eventdata, sizeof(uint32_t), 4, file) != 4 )
         return false;
 
-    event_length = (eventdata[0] & 0x3FFE0000) >> 17;
+    event_length = ( eventdata[0] & 0x3FFE0000 ) >> 17;
 
-    hit.address = ( eventdata[0] & 0x00000FFF);
+    hit.address = ( eventdata[0] & 0x00000FFF );
+
+    hit.finishcode = ( ( eventdata[0] & 0x80000000 ) > 0 ) ? 1 : 0;
 
     // Calculate full timestamp.
     hit.timestamp = (eventdata[2] & 0xFFFF);

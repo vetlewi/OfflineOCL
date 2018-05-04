@@ -85,7 +85,7 @@ private:
 
     // Static array used as a buffer.
     uint32_t eventdata[4];
-    int event_length;
+    uint32_t event_length;
 };
 
 #endif // FILEREADER_H

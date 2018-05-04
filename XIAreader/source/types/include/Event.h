@@ -33,19 +33,6 @@
 //! \author Vetle W. Ingeberg
 //! \date 2015-2018
 //! \copyright GNU Public License v. 3
-/*typedef struct subevt_t {
-	uint16_t address;		//!< Holds the address of the ADC. 
-    uint16_t adcdata;		//!< Data read out from the ADC.
-    uint16_t cfddata;       //!< Fractional difference of before/after zero-crossing.
-    double cfdcorr;         //!< Correction from the CFD.
-    int64_t timestamp;		//!< Timestamp in [ns].
-    char cfdfail;           //!< Flag to tell if the CFD was forced or not.
-
-    subevt_t() : address( 0 ), adcdata( 0 ), cfddata( 0 ), cfdcorr( 0 ), timestamp( 0 ), cfdfail( 0 ) { }
-
-    subevt_t(const word_t &w);
-
-} subevent_t;*/
 
 typedef word_t subevent_t;
 
