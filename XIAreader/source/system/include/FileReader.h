@@ -22,11 +22,11 @@
 #define FILEREADER_H
 
 #include <string>
-#include <memory>
+#include <cstdio>
 
-#include "TDRWordBuffer.h"
-//class WordBuffer;
-//struct word_t;
+#include "WordBuffer.h"
+#include "DefineFile.h"
+
 
 /*!
  * \class FileReader
@@ -52,14 +52,15 @@ public:
 	//! Open a file.
 	/*! \return true if opening was successful.
 	 */
-    bool Open(std::string filename,  /*!< Name of the file to open.	*/
-              size_t seekpos=0       /*!< Where to open the file at.	*/);
+    bool Open(const char *filename, /*!< Name of the file to open.	*/
+              int seekpos=0         /*!< Where to open the file at.	*/);
 
 	//! Read a single buffer from the file.
     /*! \return 1 for new buffer, 0 if EOF is reached or -1 if
      *  an error was encountred.
 	 */
-    int Read(WordBuffer *buffer	/*!< Buffer to put the data. 	*/);
+    int Read(word_t *buffer,    /*!< Buffer to put the data. 	*/
+             int size           /*!< How many hits to read.     */);
 
     //! Retrive the error flag.
     /*! \return The error flag.
@@ -69,7 +70,7 @@ public:
 
 private:
 	//! The object for reading files.
-	FILE * file;
+    std::FILE * file_stdio;
 
 	//! Close the file.
     void Close();
@@ -77,15 +78,8 @@ private:
 	//! Number of buffers that have been read.
 	bool errorflag;
 
-    int error_number;
-
-    int read_number;
-
+    //! Method for reading and parsing an event from the file.
     bool ReadEvent(word_t &hit);
-
-    // Static array used as a buffer.
-    uint32_t eventdata[4];
-    uint32_t event_length;
 };
 
 #endif // FILEREADER_H

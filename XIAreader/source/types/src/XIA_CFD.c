@@ -24,7 +24,7 @@ double XIA_CFD_Fraction_100MHz(uint16_t CFDvalue, char* fail)
 	cfdfailbit = ((CFDvalue & BIT15TO15) >> 15);
 	timecfd = ((CFDvalue & BIT14TO0) >> 0);
 	correction = (10*(double)timecfd)/32768.0;
-    *fail = cfdfailbit;
+    *fail = (cfdfailbit > 0 || CFDvalue == 0) ? 1 : 0;
 	return correction;
 }
 
@@ -37,7 +37,7 @@ double XIA_CFD_Fraction_250MHz(uint16_t CFDvalue, char* fail)
 	cfdtrigsource = ((CFDvalue & BIT14TO14) >> 14);
 	timecfd = ((CFDvalue & BIT13TO0) >> 0);
 	correction = (((double)timecfd)/16384.0 - cfdtrigsource)*4.0;
-    *fail = cfdfailbit;
+    *fail = (cfdfailbit > 0 || CFDvalue == 0) ? 1 : 0;
 	return correction;
 }
 

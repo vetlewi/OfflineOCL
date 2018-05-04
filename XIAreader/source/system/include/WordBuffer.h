@@ -18,58 +18,34 @@
  *                                                                             *
  *******************************************************************************/
 
-#include "TelescopeGate.h"
+#ifndef TDRWORDBUFFER_H
+#define TDRWORDBUFFER_H
 
-#include <sstream>
+#include <memory>
 
-//! Remove witespace at beginning and end.
-/*! \return The text without leading and trailing whitespace.
- */
-static std::string trim_whitespace( const std::string& text /*!< Text to be clean. */)
-{
-    size_t start = text.find_first_not_of(" \t");
-    if ( start == std::string::npos )
-        return "";
+#include "BufferType.h"
 
-    size_t end = text.find_last_not_of(" \t");
-    if ( end == std::string::npos || end<=start )
-        end = text.size();
-    return text.substr(start, end-start+1);
-}
+//! Structure type to contain individual decoded TDR words.
+//! \author Vetle W. Ingeberg
+//! \date 2015-2016
+//! \copyright GNU Public License v. 3
+typedef struct {
+    uint16_t address;		//!< Holds the address of the ADC.
+    uint16_t adcdata;		//!< Data read out from the ADC.
+    uint16_t cfddata;       //!< Fractional difference of before/after zero-crossing.
+    char cfdfail;           //!< Flag to tell if the CFD was forced or not.
+    char finishcode;        //!< Pile-up flag.
+    int64_t timestamp;		//!< Timestamp in [ns].
+    double cfdcorr;         //!< Correction from the CFD.
+} word_t;
 
-TelescopeGate::TelescopeGate(const std::string &cmd)
-{
-    std::stringstream icmd(cmd.c_str());
+class WordBuffer : public Buffer<word_t> {
+public:
+    WordBuffer() : Buffer<word_t>(BUFSIZE, new word_t[BUFSIZE]) { }
+    WordBuffer(int sz, word_t *buf ) : Buffer<word_t>(sz, buf) { }
+    ~WordBuffer() { delete[] GetBuffer(); }
+    WordBuffer *New() { return new WordBuffer(); }
+    enum { BUFSIZE = 1024 };
+};
 
-    std::string str;
-    int ncoef;
-    double *coef;
-    icmd >> str;
-    if (str == "uppper" || str == "UPPER"){
-        icmd >> ncoef;
-        coef = new double[ncoef];
-        for (int i = 0 ; i < ncoef ; ++i)
-            icmd >> coef[i];
-        polH = Polynomial(coef, ncoef);
-    }
-}
-
-
-
-void TelescopeGate::ExtractPolynomial(std::stringstream &icmd)
-{
-    std::string str;
-    int ncoef;
-    double *coef;
-    icmd >> str;
-    icmd >> ncoef;
-    coef = new double[ncoef];
-    for (int i = 0 ; i < ncoef ; ++i)
-        icmd >> coef[i];
-    str = trim_whitespace(str);
-    if (str == "UPPER" || str == "upper")
-        polH = Polynomial(coef, ncoef);
-    else if (str == "LOWER" || str == "lower")
-        polL = Polynomial(coef, ncoef);
-    delete[] coef;
-}
+#endif // TDRWORDBUFFER_H

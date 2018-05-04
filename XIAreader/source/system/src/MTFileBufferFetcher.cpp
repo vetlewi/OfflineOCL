@@ -30,7 +30,7 @@
 #include "MTFileBufferFetcher.h"
 
 #include "FileReader.h"
-#include "TDRWordBuffer.h"
+#include "WordBuffer.h"
 #include "aptr.ipp"
 
 #include <cstdlib>
@@ -284,7 +284,7 @@ void PrefetchThread::StartReading()
 
         // Reading is time-consuming and should be performed while the
         // lock is released
-        if ( reader->Read(buffer) <= 0)
+        if ( reader->Read(buffer->GetBuffer(), buffer->GetSize()) <= 0)
 			finished = true;
         { // Critical section
 			PThreadMutexLock lock( mutex );
@@ -325,7 +325,7 @@ PrefetchThread::~PrefetchThread()
 
 MTFileBufferFetcher::MTFileBufferFetcher()
 	: reader( new FileReader() )
-	, template_buffer( new TDRWordBuffer() )
+    , template_buffer( new WordBuffer() )
     , prefetch( 0 ) { }
 
 MTFileBufferFetcher::~MTFileBufferFetcher()
@@ -355,7 +355,7 @@ const WordBuffer* MTFileBufferFetcher::Next(Status& state)
 BufferFetcher::Status MTFileBufferFetcher::Open(const std::string& filename, int bufnum)
 {
 	StopPrefetching();
-    int i = reader->Open( filename, bufnum*template_buffer->GetSize() );
+    int i = reader->Open( filename.c_str(), bufnum*template_buffer->GetSize() );
     if (i > 0) return OKAY; else if ( i==0 ) return END; else return ERROR;
 }
 

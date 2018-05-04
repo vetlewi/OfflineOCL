@@ -25,7 +25,7 @@
 
 #include "DefineFile.h"
 
-class Buffer;
+//class Buffer;
 class WordBuffer;
 struct Event;
 
@@ -75,8 +75,6 @@ private:
     bool UnpackOneEvent(Event& event, /*!< The event structure to fill. 						*/
 	 					int& n_data		/*!< The amount of words extracted in current event.	*/);
 
-
-    bool PackEvent(Event &event, int start, int stop);
 
 	//! The buffer to read from.
 	const WordBuffer* buffer;

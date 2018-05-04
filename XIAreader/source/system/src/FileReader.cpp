@@ -1,40 +1,30 @@
 // FileReader 2.0
 
 #include "FileReader.h"
-#include "PixieSettings.h"
 #include "experimentsetup.h"
 #include "XIA_CFD.h"
 
 #include <cstdint>
-#include <iostream>
 
-#include "TDRWordBuffer.h"
+#include "WordBuffer.h"
 
-#define BUFFER_SIZE 1024
-//#define BUFFER_SIZE 2048
-
-
-#define DIRTY_FIX 0
-
-inline uint64_t extract(const uint64_t &val, const int &begin, const int &end)
+inline int seek(std::FILE* stream, int offset)
 {
-	uint64_t mask = (1 << (end - begin)) - 1;
-	return (val >> begin) & mask;
-}
-
-void ShowBit32(uint32_t u){
-    int values[32];
-    for (int i = 0 ; i < 32 ; ++i){
-        values[i] = u%2;
-        u = u/2;
+    long moved = 0, length = 0;
+    uint32_t head;
+    while ( moved < offset ){
+        if ( std::fread(&head, sizeof(uint32_t), 1, stream) != 1 ) // Error while reading.
+            return 1;
+        length =  ( head & 0x3FFE0000 ) >> 17;
+        if ( std::fseek(stream, length, SEEK_CUR) != 0 )
+            return 1;
+        ++moved;
     }
-    for (int i = 31 ; i >= 0 ; --i){
-        std::cout << values[i];
-    } std::cout << std::endl;
+    return 0;
 }
 
 FileReader::FileReader() :
-	file( 0 ),
+    file_stdio( nullptr ),
     errorflag( false )
 {
 }
@@ -48,14 +38,14 @@ FileReader::~FileReader()
 
 // #########################################################
 
-bool FileReader::Open(std::string filename, size_t want)
+bool FileReader::Open(const char *filename, int want)
 {
-    error_number = 0;
-    read_number = 0;
 	Close();
-    file = std::fopen(filename.c_str(), "rb");
-	errorflag = (file==0)
-                ;//|| std::fseek(file, want, SEEK_SET) != (int)want;
+    file_stdio = std::fopen(filename, "rb");
+
+    errorflag = ( file_stdio==nullptr )
+                || ( seek(file_stdio, want) != 0);
+
     return !errorflag;
 }
 
@@ -63,41 +53,38 @@ bool FileReader::Open(std::string filename, size_t want)
 
 void FileReader::Close()
 {
-	if (file){
-		std::fclose( file );
-        file = 0;
+    if (file_stdio){
+        std::fclose( file_stdio );
+        file_stdio = nullptr;
 	}
 }
 
 // #########################################################
 
-int FileReader::Read(WordBuffer *buffer)
+int FileReader::Read(word_t *buffer, int size)
 {
 
-    if ( errorflag || (!file) ){
+    if ( errorflag || (!file_stdio) ){
         return -1;
     }
 
-    word_t *data = new word_t[BUFFER_SIZE];
-    size_t n_decoded=0;
-    for (int i = 0 ; i < BUFFER_SIZE ; ++i){
-        if ( ReadEvent(data[n_decoded]) )
-             ++n_decoded;
-        else
-            break;
+
+    int have = 0;
+    while ( have < size ){
+        if ( !ReadEvent( buffer[have++]) ){
+
+            // Check if EOF or error.
+            if ( feof(file_stdio) ){
+                errorflag = false;
+                Close();
+            } else if ( ferror(file_stdio) ){
+                errorflag = true;
+            } else {
+                errorflag = true;
+            }
+            return errorflag ? -1 : 0;
+        }
     }
-
-
-
-    if (n_decoded != buffer->GetSize())
-        buffer->Resize(n_decoded);
-
-    buffer->SetBuffer(data);
-
-    if ( (n_decoded != BUFFER_SIZE) || (!file) ){
-        return 0;
-    }
-
 	return 1;
 }
 
@@ -106,8 +93,11 @@ int FileReader::Read(WordBuffer *buffer)
 bool FileReader::ReadEvent(word_t &hit)
 {
 
-    if ( fread(&eventdata, sizeof(uint32_t), 4, file) != 4 )
-        return false;
+    uint32_t eventdata[4];
+    uint32_t event_length;
+
+    if ( std::fread(&eventdata, sizeof(uint32_t), 4, file_stdio) != 4 )
+        return false; // Error or EOF.
 
     event_length = ( eventdata[0] & 0x3FFE0000 ) >> 17;
 
@@ -126,9 +116,7 @@ bool FileReader::ReadEvent(word_t &hit)
     // Extract energy
     hit.adcdata = (eventdata[3] & 0xFFFF);
 
-    // Move file to the end of the event event.
-    if ( event_length != 4)
-        fseek(file, sizeof(uint32_t)*(event_length - 4), SEEK_CUR);
+    // Move file to the end of the event event
 
     // Calculate the correct correction
     switch ( GetSamplingFrequency(hit.address) ) {
@@ -156,6 +144,9 @@ bool FileReader::ReadEvent(word_t &hit)
         hit.timestamp *= 10;
         break;
     }
+
+    if ( event_length != 4)
+        return ( std::fseek(file_stdio, sizeof(uint32_t)*(event_length - 4), SEEK_CUR) == 0 );
 
     return true;
 }

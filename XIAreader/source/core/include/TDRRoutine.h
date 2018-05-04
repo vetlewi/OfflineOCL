@@ -23,12 +23,7 @@
 
 #include "UserRoutine.h"
 #include "Histograms.h"
-#include "GainParameters.h"
-#include "TelescopeGate.h"
-#include "Telescope.h"
-#include "TimeGate.h"
 #include "ParticleRange.h"
-#include "TimeCalibration.h"
 
 
 #include <string>

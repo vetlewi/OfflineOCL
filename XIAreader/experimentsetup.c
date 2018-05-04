@@ -9,7 +9,7 @@ extern "C" {
 #endif // __cplusplus
 
 
-DetectorInfo_t pDetector[] =
+static DetectorInfo_t pDetector[] =
 {
     {0, f000MHz, unused, 0, 0},
     {1, f000MHz, unused, 0, 0},
