@@ -1,7 +1,7 @@
 # Tools
 
 
-## How to calibrate time with the GetPeak.C & GetPeak_LaBr.C scripts.
+# How to calibrate time with the GetPeak.C & GetPeak_LaBr.C scripts.
 
 The GetPeak.C & GetPeak_LaBr.C are ROOT scripts for identifying the prompt peak in the time spectrum and fitting these peaks to extract the alignment coefficients (calibrating the time spectra). Currently there isn't a script for PPACs, please do a pull request if you make a script doing the same for PPACs :)
 
@@ -21,8 +21,8 @@ parameter shift_time_de = \
 0	0	0	0	0	0	0	0
 
 parameter shift_time_labr = \
-0	0	0	0	0	0	0	0 \
-0	0	0	0	0	0	0	0	
+0	0	0	0	0	0	0	0 0	0	0	0	0	0	0	0 \
+0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 
 parameter shift_time_ppac = \
 0	0	0	0
@@ -71,8 +71,9 @@ Relace the zeros following "parameter shift_time_labr = \" in the batch file wit
 
 10) Re-run the sorting program and enjoy all your perfectly align time spectra!!
 
+### NOTE: These scripts are not perfect
 
-## The Validate.cpp program
+# The Validate.cpp program
 This is a small tool to check if the data aquisition was 'resynchronized' without the file being changed. Unfortunatly a 'resynchronized' will cause the time offsets of detectors to change. Luckily this effect is fairly small and are easily calibrated, but requires new alignment parameters each time there is such a 'resynchronization'. Since run files could potentially contain several occurences of such a 'resynchronization' we will need to split the file whenever this happends. The Validate.cpp is a short C++ program that checks run files if there are any such events. 
 
 ### How to compile

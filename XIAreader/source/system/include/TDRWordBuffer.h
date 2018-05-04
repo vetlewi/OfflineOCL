@@ -27,25 +27,14 @@
 //! \author Vetle W. Ingeberg
 //! \date 2015-2016
 //! \copyright GNU Public License v. 3
-/*typedef struct {
-	uint16_t address;		//!< Holds the address of the ADC. 
-    uint16_t adcdata;		//!< Data read out from the ADC.
-    uint16_t cfddata;       //!< Fractional difference of before/after zero-crossing.
-    int64_t timestamp;		//!< Timestamp read out.
-
-    uint16_t tracelength;	//!< Length of traces in current word.
-    uint16_t traces[2048]; 	//!< Each word can contain up to 2000 traces.
-
-    uint16_t error;
-    
-} word_t;*/
 typedef struct {
     uint16_t address;		//!< Holds the address of the ADC.
     uint16_t adcdata;		//!< Data read out from the ADC.
     uint16_t cfddata;       //!< Fractional difference of before/after zero-crossing.
-    double cfdcorr;         //!< Correction from the CFD.
-    int64_t timestamp;		//!< Timestamp in [ns].
     char cfdfail;           //!< Flag to tell if the CFD was forced or not.
+    char finishcode;        //!< Pile-up flag.
+    int64_t timestamp;		//!< Timestamp in [ns].
+    double cfdcorr;         //!< Correction from the CFD.
 } word_t;
 
 
