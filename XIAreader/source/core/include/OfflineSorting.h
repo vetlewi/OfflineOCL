@@ -28,8 +28,6 @@
 #include "RateMeter.h"
 #include "Event.h"
 
-#include "readerwriterqueue.h"
-
 //#define MTSORTING
 
 class FileBufferFetcher;

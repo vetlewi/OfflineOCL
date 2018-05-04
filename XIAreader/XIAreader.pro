@@ -24,7 +24,6 @@ INCLUDEPATH +=  source \
 SOURCES += source/main.cpp \
         source/export/src/RootWriter.cpp \
         source/export/src/MamaWriter.cpp \
-        source/core/src/DetectorRead.cpp \
         source/core/src/OfflineSorting.cpp \
         source/core/src/TDRRoutine.cpp \
         source/core/src/Unpacker.cpp \
@@ -39,7 +38,6 @@ SOURCES += source/main.cpp \
         source/types/src/Histogram2D.cpp \
         source/types/src/Histogram3D.cpp \
     	source/types/src/Parameters.cpp \
-        source/types/src/GainParameters.cpp \
         source/types/src/ParticleRange.cpp \
         source/userroutine/src/UserSort.cpp \
         experimentsetup.c \
@@ -49,12 +47,10 @@ SOURCES += source/main.cpp \
 HEADERS += source/DefineFile.h \
         source/export/include/RootWriter.h \
         source/export/include/MamaWriter.h \
-        source/core/include/DetectorRead.h \
         source/core/include/TDRRoutine.h \
         source/core/include/OfflineSorting.h \
         source/core/include/UserRoutine.h \
         source/core/include/Unpacker.h \
-        source/system/include/Logger.h \
         source/system/include/RateMeter.h \
         source/system/include/TDRWordBuffer.h \
         source/system/include/FileReader.h \
@@ -70,11 +66,8 @@ HEADERS += source/DefineFile.h \
         source/types/include/Histogram2D.h \
         source/types/include/Histogram3D.h \
         source/types/include/Parameters.h \
-        source/types/include/GainParameters.h \
         source/types/include/ParticleRange.h \
         source/userroutine/include/UserSort.h \
         source/system/include/PixieSettings.h \
         source/system/include/BufferType.h \
-        experimentsetup.h \
-        source/types/include/atomicops.h \
-        source/types/include/readerwriterqueue.h
+        experimentsetup.h
