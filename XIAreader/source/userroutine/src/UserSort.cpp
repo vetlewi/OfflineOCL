@@ -592,7 +592,7 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
             bool ppac_prompt =  false;
 
             for (int n = 0 ; n < NUM_PPAC ; ++n){
-                for (int m = 0 ; m < event.n_ppac[m] ; ++m){
+                for (int m = 0 ; m < event.n_ppac[n] ; ++m){
 
                     double tdiff_ppac = CalcTimediff(event.w_labr[i][j], event.w_ppac[n][m]);
                     energy_time_ppac[i]->Fill(energy, tdiff_ppac);
