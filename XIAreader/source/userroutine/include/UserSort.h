@@ -98,9 +98,9 @@ private:
 
 
     // Particle - gamma-ray coincidence matrix
-    Histogram2Dp alfna, alfna_bg;
-    Histogram2Dp alfna_ppac, alfna_ppac_bg;
-    Histogram2Dp alfna_veto_ppac, alfna_veto_ppac_bg;
+    Histogram2Dp exgam, exgam_bg;
+    Histogram2Dp exgam_ppac, exgam_ppac_bg;
+    Histogram2Dp exgam_veto_ppac, exgam_veto_ppac_bg;
 
     // Gain labr
     Parameter gain_labr;
@@ -142,7 +142,7 @@ private:
     Parameter thick_range;
 
 
-    // Time gates for the LaBr detectors, e.g. for making the ALFNA matrices
+    // Time gates for the LaBr detectors, e.g. for making the exgam matrices
     Parameter labr_time_cuts;
 
     // Time gates for the ppacs.
