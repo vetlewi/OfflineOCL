@@ -350,23 +350,23 @@ void UserSort::CreateSpectra()
     sprintf(tmp2, "Excitation energy, all");
     h_ex_all = Spec(tmp, tmp2, 20000, 0, 20000, "Excitation energy [keV]");
 
-    sprintf(tmp, "alfna");
-    alfna = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+    sprintf(tmp, "exgam");
+    exgam = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
-    sprintf(tmp, "alfna_bg");
-    alfna_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+    sprintf(tmp, "exgam_bg");
+    exgam_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
-    sprintf(tmp, "alfna_ppac");
-    alfna_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+    sprintf(tmp, "exgam_ppac");
+    exgam_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
-    sprintf(tmp, "alfna_ppac_bg");
-    alfna_ppac_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+    sprintf(tmp, "exgam_ppac_bg");
+    exgam_ppac_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
-    sprintf(tmp, "alfna_veto_ppac");
-    alfna_veto_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+    sprintf(tmp, "exgam_veto_ppac");
+    exgam_veto_ppac = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
-    sprintf(tmp, "alfna_veto_ppac_bg");
-    alfna_veto_ppac_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
+    sprintf(tmp, "exgam_veto_ppac_bg");
+    exgam_veto_ppac_bg = Mat(tmp, tmp, 1500, 0, 15000, "LaBr [keV]", 1600, -1000, 15000, "Ex [keV]");
 
 
     n_fail_e = 0;
@@ -546,12 +546,12 @@ void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,cons
             // Check time gate.
             switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {
                 case is_prompt : {
-                    alfna->Fill(energy, excitation);
+                    exgam->Fill(energy, excitation);
                     break;
                 }
                 case is_background : {
-                    alfna->Fill(energy, excitation, -1);
-                    alfna_bg->Fill(energy, excitation);
+                    exgam->Fill(energy, excitation, -1);
+                    exgam_bg->Fill(energy, excitation);
                     break;
                 }
                 case ignore : {
@@ -592,7 +592,7 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
             bool ppac_prompt =  false;
 
             for (int n = 0 ; n < NUM_PPAC ; ++n){
-                for (int m = 0 ; m < event.n_ppac[m] ; ++m){
+                for (int m = 0 ; m < event.n_ppac[n] ; ++m){
 
                     double tdiff_ppac = CalcTimediff(event.w_labr[i][j], event.w_ppac[n][m]);
                     energy_time_ppac[i]->Fill(energy, tdiff_ppac);
@@ -616,22 +616,22 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
             // Check time gate.
             switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {
                 case is_prompt : {
-                    alfna->Fill(energy, excitation);
+                    exgam->Fill(energy, excitation);
                     if (ppac_prompt)
-                        alfna_ppac->Fill(energy, excitation);
+                        exgam_ppac->Fill(energy, excitation);
                     else
-                        alfna_veto_ppac->Fill(energy, excitation);
+                        exgam_veto_ppac->Fill(energy, excitation);
                     break;
                 }
                 case is_background : {
-                    alfna->Fill(energy, excitation, -1);
-                    alfna_bg->Fill(energy, excitation);
+                    exgam->Fill(energy, excitation, -1);
+                    exgam_bg->Fill(energy, excitation);
                     if (ppac_prompt){
-                        alfna_ppac->Fill(energy, excitation, -1);
-                        alfna_ppac_bg->Fill(energy, excitation);
+                        exgam_ppac->Fill(energy, excitation, -1);
+                        exgam_ppac_bg->Fill(energy, excitation);
                     } else {
-                        alfna_veto_ppac->Fill(energy, excitation, -1);
-                        alfna_veto_ppac_bg->Fill(energy, excitation);
+                        exgam_veto_ppac->Fill(energy, excitation, -1);
+                        exgam_veto_ppac_bg->Fill(energy, excitation);
                     }
                     break;
                 }

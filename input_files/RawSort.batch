@@ -37,7 +37,7 @@ parameter ex_from_ede    = 14.5 -1.0436 -0.001220 \
 14.5 -1.0177 -0.001220 \
 
 
-# labbr time gates, for making the ALFNA matrices 
+# labbr time gates, for making the exgam matrices 
 # found by looking at the m_nai_t plot and projecting it
 # down to the x-axis/m_nai_e_t_c x-axis plot 
 # remember to subtract the same amount of channels 
