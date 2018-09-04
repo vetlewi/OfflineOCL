@@ -595,7 +595,7 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
                 for (int m = 0 ; m < event.n_ppac[n] ; ++m){
 
                     double tdiff_ppac = CalcTimediff(event.w_labr[i][j], event.w_ppac[n][m]);
-                    energy_time_ppac[i]->Fill(energy, tdiff_ppac);
+                    energy_time_ppac[n]->Fill(energy, tdiff_ppac);
 
                     switch ( CheckTimeStatus(tdiff_ppac, ppac_time_cuts) ) {
                         case is_prompt : {
