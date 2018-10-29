@@ -539,9 +539,6 @@ void UserSort::AnalyzeGamma(const word_t &de_word, const double &excitation,cons
             energy_time_labr[i]->Fill(energy, tdiff);
             energy_time_labr_all->Fill(energy, tdiff);
 
-            if ( excitation > 8473.60 )
-                energy_time_labr_above[i]->Fill(energy, tdiff);
-
 
             // Check time gate.
             switch ( CheckTimeStatus(tdiff, labr_time_cuts) ) {
@@ -603,7 +600,6 @@ void UserSort::AnalyzeGammaPPAC(const word_t &de_word, const double &excitation,
                             break;
                         }
                         case is_background : {
-                            ppac_prompt = false;
                             break;
                         }
                         case ignore : {
